@@ -1,0 +1,79 @@
+name: Hybrid Proof Fabric
+
+on:
+  push:
+    branches:
+      - feature/node-consent-resource-receipts-v0.1
+    paths:
+      - "specs/hybrid-proof-fabric-v0.1.md"
+      - "registries/proof-suite.v0.1.json"
+      - "schemas/proof-receipt.schema.json"
+      - "schemas/seraphim-reputation-proof.schema.json"
+      - "examples/proof-receipt.service.simulated.json"
+      - "examples/seraphim-reputation-proof.simulated.json"
+      - "scripts/validate_hybrid_proof_fabric.py"
+      - "tests/test_hybrid_proof_fabric.py"
+      - ".github/workflows/hybrid-proof-fabric.yml"
+  pull_request:
+    paths:
+      - "specs/hybrid-proof-fabric-v0.1.md"
+      - "registries/proof-suite.v0.1.json"
+      - "schemas/proof-receipt.schema.json"
+      - "schemas/seraphim-reputation-proof.schema.json"
+      - "examples/proof-receipt.service.simulated.json"
+      - "examples/seraphim-reputation-proof.simulated.json"
+      - "scripts/validate_hybrid_proof_fabric.py"
+      - "tests/test_hybrid_proof_fabric.py"
+      - ".github/workflows/hybrid-proof-fabric.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hybrid-proofs-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate Python syntax without bytecode
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          python -B - <<'PY'
+          from pathlib import Path
+          for name in (
+              "scripts/validate_hybrid_proof_fabric.py",
+              "tests/test_hybrid_proof_fabric.py",
+          ):
+              path = Path(name)
+              compile(path.read_text(encoding="utf-8"), str(path), "exec")
+              print(f"VALID_PYTHON={path}")
+          PY
+      - name: Validate JSON syntax
+        run: |
+          for file in \
+            registries/proof-suite.v0.1.json \
+            schemas/proof-receipt.schema.json \
+            schemas/seraphim-reputation-proof.schema.json \
+            examples/proof-receipt.service.simulated.json \
+            examples/seraphim-reputation-proof.simulated.json; do
+            python -m json.tool "$file" >/dev/null
+            echo "VALID_JSON=$file"
+          done
+      - name: Validate proof fabric invariants
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python -B scripts/validate_hybrid_proof_fabric.py
+      - name: Run adversarial tests
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python -B -m unittest tests/test_hybrid_proof_fabric.py -v
+      - name: Verify checkout remained clean
+        run: test -z "$(git status --porcelain=v1 --untracked-files=all)"

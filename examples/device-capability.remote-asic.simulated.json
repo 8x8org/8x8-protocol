@@ -1,0 +1,23 @@
+{
+  "schema": "8x8.device-capability.v0.1",
+  "attestation_id": "CAPABILITY.example.remote-asic.20260801",
+  "node_id": "NODE.example.remote-asic",
+  "platform": "REMOTE_ASIC_RIG",
+  "hardware_class": "ASIC_MINER",
+  "roles": ["MINING_ELIGIBLE", "REMOTE_MINER"],
+  "cpu_logical_units": 2,
+  "memory_bytes": 1073741824,
+  "gpu_class": "NONE",
+  "gpu_memory_bytes": null,
+  "storage_available_bytes": 1073741824,
+  "background_service_supported": true,
+  "local_crypto_mining_policy": "SUPPORTED_AFTER_ALLOWLISTING",
+  "remote_miner_management_supported": true,
+  "approved_pow_algorithms": ["SHA-256"],
+  "thermal_sensor_available": true,
+  "power_state_available": true,
+  "network_state_available": true,
+  "attested_at": "2026-08-01T23:20:00Z",
+  "expires_at": "2026-08-02T23:20:00Z",
+  "attestation_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}

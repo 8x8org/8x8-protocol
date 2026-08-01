@@ -1,0 +1,31 @@
+{
+  "schema": "8x8.work-allocation.v0.1",
+  "allocation_id": "ALLOCATION.example.remote-asic-btc.20260801",
+  "node_id": "NODE.example.remote-asic",
+  "capability_attestation_id": "CAPABILITY.example.remote-asic.20260801",
+  "consent_id": "CONSENT.example.remote-asic.20260801",
+  "profile_id": "STANDARD_25",
+  "workload_type": "POW_MINING",
+  "workload_id": "BTC_SHA256_POOL_FIXTURE.v1",
+  "algorithm_or_protocol": "SHA-256",
+  "network_or_domain": "BITCOIN_MAINNET",
+  "coordinator_id": "8x8.protocol.fixture",
+  "pool_or_provider_id": "SIMULATED_POOL",
+  "code_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "resource_ceiling": {
+    "cpu_percent": 5,
+    "gpu_percent": 0,
+    "available_memory_percent": 10,
+    "storage_bytes": 1048576,
+    "upload_bytes": 1048576,
+    "download_bytes": 1048576,
+    "duration_seconds": 60
+  },
+  "starts_at": "2026-08-01T23:21:00Z",
+  "expires_at": "2026-08-01T23:22:00Z",
+  "treasury_destination_ref": "TREASURYREF.example.btc.fixture",
+  "reward_accounting_stage": "SIMULATED",
+  "profitability_guaranteed": false,
+  "user_disclosure_receipt": "fixture-only-explicit-remote-asic-disclosure",
+  "allocation_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+}

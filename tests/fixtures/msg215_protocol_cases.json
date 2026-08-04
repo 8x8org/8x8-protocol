@@ -38,7 +38,7 @@
     },
     "registry": {
       "models": [
-        {"model_id": "local:vision:moondream2", "status": "VERIFIED_INSTALLED", "evidence": ["sha256:model-manifest"]}
+        {"model_id": "local:vision:moondream2", "status": "VERIFIED_INSTALLED", "evidence": ["sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"]}
       ],
       "agents": [
         {"agent_id": "agent:hermes", "status": "VERIFIED_ACTIVE", "evidence": ["receipt:hermes-heartbeat"], "productive_receipt_ref": "receipt:hermes-task-001"},
@@ -102,6 +102,8 @@
   "negative": {
     "duplicate_model_ids": ["model:x", "model:x"],
     "duplicate_agent_ids": ["agent:x", "agent:x"],
+    "malformed_evidence_refs": ["sha256:model-manifest", "receipt:", "plain-text-claim"],
+    "running_model_without_receipt": {"model_id": "model:fiction", "status": "VERIFIED_RUNNING", "evidence": ["source:model-card"]},
     "persona_claimed_active_without_receipt": {"agent_id": "agent:fiction", "status": "VERIFIED_ACTIVE", "evidence": ["source:soul-file"], "productive_receipt_ref": null},
     "discord_unsafe": {"default_mode": "OWNER_GATED_WRITE", "public_post_requires_gate": false, "dm_requires_gate": false, "admin_actions_forbidden": false, "store_private_dm_body": true},
     "trial_wrong_seconds": 5279,

@@ -22,7 +22,7 @@
     "schema_version": {"const": "8x8.plugin-manifest.v1"},
     "plugin_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"},
     "name": {"type": "string", "minLength": 1, "maxLength": 160},
-    "version": {"type": "string", "pattern": "^0|[1-9][0-9]*\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?$"},
+    "version": {"type": "string", "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"},
     "8x8_label": {"const": "8x8-compatible"},
     "description": {"type": "string", "maxLength": 2000},
     "runtime": {

@@ -75,7 +75,9 @@
           "location": {
             "properties": {
               "latitude": {"type": "null"},
-              "longitude": {"type": "null"}
+              "longitude": {"type": "null"},
+              "precision_meters": {"type": "null"},
+              "source": {"enum": ["USER_SELECTED", "DEVICE_APPROXIMATE", "NETWORK_APPROXIMATE", "NONE"]}
             }
           }
         }
@@ -85,7 +87,12 @@
       "if": {"properties": {"visibility": {"const": "PRECISE_TEMPORARY"}}},
       "then": {
         "properties": {
-          "consent": {"properties": {"granted": {"const": true}}},
+          "consent": {
+            "properties": {
+              "granted": {"const": true},
+              "granted_at": {"type": "string", "format": "date-time"}
+            }
+          },
           "location": {
             "required": ["latitude", "longitude", "precision_meters"],
             "properties": {
@@ -93,6 +100,18 @@
               "longitude": {"type": "number"},
               "precision_meters": {"type": "integer", "maximum": 1000},
               "source": {"enum": ["USER_SELECTED", "DEVICE_PRECISE"]}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"consent": {"properties": {"granted": {"const": true}}}}},
+      "then": {
+        "properties": {
+          "consent": {
+            "properties": {
+              "granted_at": {"type": "string", "format": "date-time"}
             }
           }
         }

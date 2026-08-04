@@ -1,0 +1,57 @@
+{
+  "positive": {
+    "profile_id": "8X8-A2B3-C4D5",
+    "credential": {
+      "methods": ["PASSWORD", "PASSKEY"],
+      "password_storage": "ARGON2ID",
+      "passkey_private_material_server_stored": false,
+      "step_up_required_for_sensitive_actions": true
+    },
+    "session": {
+      "session_id": "ses_0123456789abcdef",
+      "issued_at": "2026-08-04T17:00:00Z",
+      "expires_at": "2026-08-04T18:00:00Z",
+      "nonce": "AbCdEfGhIjKlMnOpQrStUv",
+      "rotation_counter": 2,
+      "revocation_supported": true,
+      "replay_cache_required": true
+    },
+    "recovery": {
+      "token_hash_only": true,
+      "single_use": true,
+      "expires_in_seconds": 900,
+      "invalidates_existing_sessions": true,
+      "audit_receipt_required": true
+    },
+    "abuse_controls": {
+      "rate_limit_keyed": true,
+      "multi_account_detection": true,
+      "device_signal_minimized": true,
+      "trial_reissue_default": "DENY"
+    },
+    "redaction": {
+      "passwords": "NEVER_LOG",
+      "recovery_tokens": "HASH_ONLY",
+      "session_tokens": "NEVER_LOG",
+      "passkey_assertions": "METADATA_ONLY",
+      "private_identity_subjects": "PSEUDONYMIZE"
+    },
+    "state": "TEST_MODE"
+  },
+  "negative": {
+    "plaintext_password": {"password_storage": "PLAINTEXT"},
+    "server_stored_passkey_secret": {"passkey_private_material_server_stored": true},
+    "replayable_session": {"nonce": "short", "replay_cache_required": false},
+    "non_revocable_session": {"revocation_supported": false},
+    "reusable_recovery": {"token_hash_only": false, "single_use": false, "invalidates_existing_sessions": false},
+    "long_lived_recovery": {"expires_in_seconds": 86400},
+    "trial_reissue_allowed": {"trial_reissue_default": "ALLOW"},
+    "sensitive_logs": {
+      "passwords": "PLAINTEXT",
+      "recovery_tokens": "PLAINTEXT",
+      "session_tokens": "PLAINTEXT",
+      "passkey_assertions": "FULL",
+      "private_identity_subjects": "RAW"
+    }
+  }
+}

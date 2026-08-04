@@ -2,12 +2,15 @@
 from __future__ import annotations
 
 import json
+import re
 from decimal import Decimal
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests" / "fixtures" / "msg215_protocol_cases.json"
 DATA = json.loads(FIXTURE.read_text(encoding="utf-8"))
+SHA256_RE = re.compile(r"^sha256:[a-f0-9]{64}$")
+COMMIT_RE = re.compile(r"^[a-f0-9]{40}$")
 
 
 def require(condition: bool, message: str) -> None:
@@ -116,6 +119,34 @@ def test_private_projection_and_receive_only_design() -> None:
     require(unsafe["live_actions"] is True, "unsafe live-action fixture must be rejected")
 
 
+def test_cryptographic_receipt_and_provenance() -> None:
+    receipt = DATA["positive"]["cryptographic_receipt"]
+    require(SHA256_RE.fullmatch(receipt["subject_digest"]) is not None, "receipt digest must be a canonical SHA-256 reference")
+    require(receipt["signature_state"] == "SIGNED_VERIFIED", "positive fixture requires a verified signature state")
+    require(receipt["signature"] is not None, "verified signature state requires signature evidence")
+    require(receipt["signature"]["scheme"] in {"ED25519", "ECDSA_P256", "RSA_PSS", "SIGSTORE_KEYLESS"}, "unsupported signature scheme")
+    require(receipt["signature"]["signature_ref"].startswith(("sigstore:", "signature:")), "signature must reference verification material")
+    require(COMMIT_RE.fullmatch(receipt["provenance"]["source_commit"]) is not None, "provenance requires a full commit digest")
+    require(receipt["provenance"]["slsa_level"] >= 1, "positive provenance fixture requires at least SLSA level 1 metadata")
+    require(bool(receipt["provenance"]["in_toto_statement_ref"]), "in-toto statement reference required")
+    require(receipt["supply_chain"]["tuf_metadata_state"] == "VERIFIED", "TUF metadata must be verified")
+    require(receipt["supply_chain"]["sbom_state"] == "CYCLONEDX_VERIFIED", "CycloneDX SBOM must be verified")
+    require(receipt["supply_chain"]["sigstore_state"] == "VERIFIED", "Sigstore bundle must be verified")
+    require(receipt["privacy"]["contains_secrets"] is False, "receipt must not contain secrets")
+    require(receipt["privacy"]["contains_private_payload"] is False, "receipt must not contain private payloads")
+
+    mislabeled = DATA["negative"]["hash_mislabeled_signature"]
+    require(SHA256_RE.fullmatch(mislabeled["subject_digest"]) is not None, "negative fixture still needs a valid hash")
+    require(mislabeled["signature_state"] == "SIGNED_VERIFIED" and mislabeled["signature"] is None, "hash-only evidence must not be called a verified signature")
+
+    unsafe = DATA["negative"]["provenance_unsafe"]
+    require(COMMIT_RE.fullmatch(unsafe["source_commit"]) is None, "unsafe provenance must have an invalid commit reference")
+    require(unsafe["contains_secrets"] is True, "unsafe provenance fixture must expose secret risk")
+    require(unsafe["contains_private_payload"] is True, "unsafe provenance fixture must expose private-payload risk")
+    require(unsafe["sigstore_state"] == "INVALID", "invalid Sigstore state must be rejected")
+    require(unsafe["tuf_metadata_state"] == "INVALID", "invalid TUF state must be rejected")
+
+
 def main() -> None:
     tests = [
         test_pricing,
@@ -123,6 +154,7 @@ def main() -> None:
         test_discord_authority,
         test_model_and_agent_truth,
         test_private_projection_and_receive_only_design,
+        test_cryptographic_receipt_and_provenance,
     ]
     for test in tests:
         test()

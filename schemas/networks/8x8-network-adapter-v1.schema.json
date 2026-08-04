@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/schemas/networks/8x8-network-adapter-v1.schema.json",
+  "title": "8x8 Network Adapter V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "adapter_id",
+    "network",
+    "network_identity",
+    "environment",
+    "mode",
+    "finality_policy",
+    "secret_material_present",
+    "spend_authority_present",
+    "live_actions_enabled",
+    "evidence",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {"const": "8x8.network-adapter.v1"},
+    "adapter_id": {"type": "string", "pattern": "^adapter:[a-z0-9][a-z0-9._:-]{2,95}$"},
+    "network": {"enum": ["BITCOIN", "MONERO", "ETHEREUM", "BNB_SMART_CHAIN", "SOLANA", "TON", "PI_NETWORK"]},
+    "network_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["namespace", "reference"],
+      "properties": {
+        "namespace": {"enum": ["BIP122", "CAIP2", "MONERO_NETWORK", "TON_NETWORK", "PI_NETWORK"]},
+        "reference": {"type": "string", "minLength": 3, "maxLength": 160}
+      }
+    },
+    "environment": {"enum": ["MAINNET_DESIGN_ONLY", "TESTNET", "DEVNET", "SANDBOX"]},
+    "mode": {"enum": ["WATCH_ONLY", "RECEIVE_ONLY", "VIEW_ONLY", "READ_ONLY_RPC", "SIMULATED"]},
+    "address_handling": {"enum": ["NO_ADDRESS_STORED", "PUBLIC_RECEIVE_REFERENCE_ONLY", "HASHED_REFERENCE_ONLY"]},
+    "finality_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["confirmation_basis", "minimum_confirmations", "reorg_handling"],
+      "properties": {
+        "confirmation_basis": {"enum": ["BLOCK_CONFIRMATIONS", "FINALIZED_CHECKPOINT", "NETWORK_ACCEPTED", "SIMULATED"]},
+        "minimum_confirmations": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "reorg_handling": {"enum": ["REVOKE_PENDING", "RECHECK_UNTIL_FINAL", "NOT_APPLICABLE"]}
+      }
+    },
+    "fee_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "estimation_only": {"const": true},
+        "max_fee_policy_ref": {"type": "string", "pattern": "^(policy|sha256):"}
+      }
+    },
+    "secret_material_present": {"const": false},
+    "spend_authority_present": {"const": false},
+    "live_actions_enabled": {"const": false},
+    "automatic_swap_enabled": {"const": false},
+    "automatic_bridge_enabled": {"const": false},
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^(source|receipt|sha256|standard|owner-confirmation):"}
+    },
+    "status": {"enum": ["DESIGN_ONLY", "SCHEMA_VALIDATED", "FIXTURE_VALIDATED", "TESTNET_VALIDATED", "BLOCKED", "SUPERSEDED"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"network": {"const": "BITCOIN"}}},
+      "then": {
+        "properties": {
+          "mode": {"enum": ["WATCH_ONLY", "RECEIVE_ONLY", "SIMULATED"]},
+          "network_identity": {"properties": {"namespace": {"const": "BIP122"}}}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"network": {"const": "MONERO"}}},
+      "then": {
+        "properties": {
+          "mode": {"enum": ["VIEW_ONLY", "RECEIVE_ONLY", "SIMULATED"]},
+          "network_identity": {"properties": {"namespace": {"const": "MONERO_NETWORK"}}}
+        }
+      }
+    }
+  ]
+}

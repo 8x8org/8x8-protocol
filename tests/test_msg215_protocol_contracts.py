@@ -11,6 +11,8 @@ FIXTURE = ROOT / "tests" / "fixtures" / "msg215_protocol_cases.json"
 DATA = json.loads(FIXTURE.read_text(encoding="utf-8"))
 SHA256_RE = re.compile(r"^sha256:[a-f0-9]{64}$")
 COMMIT_RE = re.compile(r"^[a-f0-9]{40}$")
+EVIDENCE_RE = re.compile(r"^(receipt|source|commit|sha256|artifact|registry):[A-Za-z0-9][A-Za-z0-9._:/@+-]{2,509}$")
+RECEIPT_RE = re.compile(r"^receipt:[A-Za-z0-9][A-Za-z0-9._:/@+-]{2,503}$")
 
 
 def require(condition: bool, message: str) -> None:
@@ -87,19 +89,26 @@ def test_model_and_agent_truth() -> None:
 
     for model in registry["models"]:
         require(model["evidence"], "model record requires evidence")
-        require(model["status"] != "VERIFIED_RUNNING" or any(ref.startswith("receipt:") for ref in model["evidence"]), "running model requires runtime receipt")
+        require(all(EVIDENCE_RE.fullmatch(ref) for ref in model["evidence"]), "model evidence must use a typed reference")
+        require(model["status"] != "VERIFIED_RUNNING" or any(RECEIPT_RE.fullmatch(ref) for ref in model["evidence"]), "running model requires runtime receipt")
 
     for agent in registry["agents"]:
         require(agent["evidence"], "agent record requires evidence")
+        require(all(EVIDENCE_RE.fullmatch(ref) for ref in agent["evidence"]), "agent evidence must use a typed reference")
         if agent["status"] == "PERSONA_ONLY":
             require(agent.get("productive_receipt_ref") is None, "persona cannot claim productive runtime")
         if agent["status"] == "VERIFIED_ACTIVE":
             require(bool(agent.get("productive_receipt_ref")), "active/productive agent requires receipt")
+            require(RECEIPT_RE.fullmatch(agent["productive_receipt_ref"]) is not None, "productive receipt must use receipt namespace")
+            require(any(RECEIPT_RE.fullmatch(ref) for ref in agent["evidence"]), "active agent evidence must include a runtime receipt")
 
     require(len(set(DATA["negative"]["duplicate_model_ids"])) < len(DATA["negative"]["duplicate_model_ids"]), "duplicate model fixture must be rejected")
     require(len(set(DATA["negative"]["duplicate_agent_ids"])) < len(DATA["negative"]["duplicate_agent_ids"]), "duplicate agent fixture must be rejected")
+    require(all(EVIDENCE_RE.fullmatch(ref) is None for ref in DATA["negative"]["malformed_evidence_refs"]), "malformed evidence fixtures must be rejected")
+    fake_model = DATA["negative"]["running_model_without_receipt"]
+    require(fake_model["status"] == "VERIFIED_RUNNING" and not any(RECEIPT_RE.fullmatch(ref) for ref in fake_model["evidence"]), "false model liveness fixture must be rejected")
     fake = DATA["negative"]["persona_claimed_active_without_receipt"]
-    require(fake["status"] == "VERIFIED_ACTIVE" and fake["productive_receipt_ref"] is None, "false liveness fixture must be rejected")
+    require(fake["status"] == "VERIFIED_ACTIVE" and fake["productive_receipt_ref"] is None, "false agent liveness fixture must be rejected")
 
 
 def test_private_projection_and_receive_only_design() -> None:

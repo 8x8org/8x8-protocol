@@ -1,13 +1,20 @@
 from __future__ import annotations
 
 import copy
+import importlib.util
 import json
 import unittest
 from pathlib import Path
 
-from tools.validate_8x8_plugin import PluginValidationError, validate_plugin
-
 ROOT = Path(__file__).resolve().parents[1]
+MODULE_PATH = ROOT / "tools/validate_8x8_plugin.py"
+SPEC = importlib.util.spec_from_file_location("validate_8x8_plugin", MODULE_PATH)
+assert SPEC and SPEC.loader
+MODULE = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(MODULE)
+PluginValidationError = MODULE.PluginValidationError
+validate_plugin = MODULE.validate_plugin
+
 SCHEMA = json.loads((ROOT / "schemas/plugins/8x8-plugin-manifest-v1.schema.json").read_text())
 MANIFEST = json.loads((ROOT / "examples/plugins/public-status-card/8x8-plugin.json").read_text())
 

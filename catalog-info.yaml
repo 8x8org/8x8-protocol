@@ -1,0 +1,44 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: 8x8-protocol
+  title: 8x8 Protocol
+  description: Public contracts for identity, entitlements, release units, plugins, presence, world nodes, evidence and multichain adapters.
+  annotations:
+    github.com/project-slug: 8x8org/8x8-protocol
+  tags:
+    - 8x8
+    - protocol
+    - json-schema
+    - release-units
+    - plugins
+    - privacy
+    - provenance
+  links:
+    - url: https://github.com/8x8org/8x8-protocol
+      title: Source
+      icon: github
+spec:
+  type: library
+  lifecycle: experimental
+  owner: user:default/flashtm8
+  system: 8x8-public-product
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: 8x8-public-product
+  title: 8x8 Public Product
+  description: Public-safe 8x8 clients, protocols, release units and compatible developer extensions.
+spec:
+  owner: user:default/flashtm8
+  domain: 8x8-ecosystem
+---
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: 8x8-ecosystem
+  title: 8x8 Ecosystem
+  description: Evidence-backed public product and extension ecosystem governed by the private 8x8 control plane.
+spec:
+  owner: user:default/flashtm8

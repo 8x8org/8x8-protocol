@@ -26,6 +26,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install pinned schema validator
+        run: python -m pip install --disable-pip-version-check --no-input "jsonschema==4.23.0"
       - name: Validate JSON syntax
         run: |
           find tests/fixtures -type f -name 'msg215_*.json' -print0 \
@@ -34,6 +36,8 @@ jobs:
           find schemas -type f -name '*.schema.json' -print0 \
             | sort -z \
             | xargs -0 -n1 python -m json.tool >/dev/null
+      - name: Validate JSON Schemas against Draft 2020-12
+        run: python tests/test_msg215_schema_metaschema.py
       - name: Run identity, entitlement, registry and trust invariants
         run: python tests/test_msg215_protocol_contracts.py
       - name: Run authentication lifecycle invariants

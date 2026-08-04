@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/schemas/world/8x8-world-node-v1.schema.json",
+  "title": "8x8 World Node V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "node_id",
+    "node_type",
+    "label",
+    "status",
+    "evidence_state",
+    "position",
+    "visibility",
+    "links",
+    "actions"
+  ],
+  "properties": {
+    "schema_version": {"const": "8x8.world-node.v1"},
+    "node_id": {"type": "string", "pattern": "^[a-zA-Z0-9._:-]{3,160}$"},
+    "node_type": {"enum": ["CORE", "WORLD", "SECTOR", "SERVICE", "AGENT", "MODEL", "CONNECTOR", "REPOSITORY", "DEPLOYMENT", "PLUGIN", "USER_CLUSTER", "TREASURY_PUBLIC_VIEW", "MISSION", "EVIDENCE"]},
+    "label": {"type": "string", "minLength": 1, "maxLength": 160},
+    "summary": {"type": "string", "maxLength": 1000},
+    "status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "color_token", "severity", "freshness", "observed_at"],
+      "properties": {
+        "state": {"enum": ["HEALTHY", "DEGRADED", "WARNING", "BLOCKED", "DOWN", "STALE", "UNKNOWN", "DISABLED", "MAINTENANCE"]},
+        "color_token": {"enum": ["GREEN", "CYAN", "YELLOW", "ORANGE", "RED", "BLACK", "GRAY", "PURPLE"]},
+        "severity": {"type": "integer", "minimum": 0, "maximum": 7},
+        "freshness": {"enum": ["LIVE", "FRESH", "STALE", "UNKNOWN"]},
+        "observed_at": {"type": ["string", "null"], "format": "date-time"},
+        "evidence_digest": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "evidence_state": {"enum": ["CLAIMED", "DESIGNED", "IMPLEMENTED", "TESTED", "RECEIPT_VERIFIED", "RUNNING", "DEPLOYED", "PUBLICLY_RELEASED", "ADOPTED", "STALE", "UNKNOWN"]},
+    "position": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["space", "x", "y", "z"],
+      "properties": {
+        "space": {"enum": ["ART_BOARD", "GLOBAL_GLOBE", "REGIONAL_MAP", "WORLD", "SECTOR"]},
+        "x": {"type": "number"},
+        "y": {"type": "number"},
+        "z": {"type": "number"},
+        "latitude": {"type": ["number", "null"], "minimum": -90, "maximum": 90},
+        "longitude": {"type": ["number", "null"], "minimum": -180, "maximum": 180}
+      }
+    },
+    "visibility": {"enum": ["PUBLIC", "AUTHENTICATED", "PRIVATE", "OWNER_ONLY"]},
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target_node_id", "relationship"],
+        "properties": {
+          "target_node_id": {"type": "string"},
+          "relationship": {"enum": ["CONTAINS", "DEPENDS_ON", "PROVIDES", "CONSUMES", "ROUTES_TO", "DEPLOYED_AS", "EVIDENCED_BY", "SUPERSEDES", "MIRRORS"]}
+        }
+      }
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action_id", "mode", "authority"],
+        "properties": {
+          "action_id": {"type": "string"},
+          "mode": {"enum": ["HELP", "INSPECT", "ZOOM", "OPEN_DOCS", "OPEN_EVIDENCE", "SUGGEST", "REQUEST_ACCESS", "OWNER_GATED_ACTION"]},
+          "authority": {"enum": ["PUBLIC", "AUTHENTICATED", "OWNER_GATED"]}
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"properties": {"state": {"const": "HEALTHY"}}}}},
+      "then": {"properties": {"status": {"properties": {"color_token": {"const": "GREEN"}}}}}
+    },
+    {
+      "if": {"properties": {"status": {"properties": {"state": {"const": "DOWN"}}}}},
+      "then": {"properties": {"status": {"properties": {"color_token": {"const": "RED"}}}}}
+    },
+    {
+      "if": {"properties": {"status": {"properties": {"state": {"enum": ["STALE", "UNKNOWN"]}}}}},
+      "then": {"properties": {"status": {"properties": {"color_token": {"enum": ["BLACK", "GRAY"]}}}}}
+    }
+  ]
+}

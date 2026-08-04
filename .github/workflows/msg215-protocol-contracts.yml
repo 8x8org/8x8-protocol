@@ -5,6 +5,9 @@ on:
     paths:
       - "schemas/**"
       - "tests/**"
+      - "examples/**"
+      - "tools/**"
+      - "catalog-info.yaml"
       - ".github/workflows/msg215-protocol-contracts.yml"
   push:
     branches:
@@ -12,6 +15,9 @@ on:
     paths:
       - "schemas/**"
       - "tests/**"
+      - "examples/**"
+      - "tools/**"
+      - "catalog-info.yaml"
       - ".github/workflows/msg215-protocol-contracts.yml"
 
 permissions:
@@ -20,7 +26,7 @@ permissions:
 jobs:
   protocol-contracts:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 7
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -36,6 +42,9 @@ jobs:
           find schemas -type f -name '*.schema.json' -print0 \
             | sort -z \
             | xargs -0 -n1 python -m json.tool >/dev/null
+          find examples -type f -name '*.json' -print0 \
+            | sort -z \
+            | xargs -0 -n1 python -m json.tool >/dev/null
       - name: Validate JSON Schemas against Draft 2020-12
         run: python tests/test_msg215_schema_metaschema.py
       - name: Run identity, entitlement, registry and trust invariants
@@ -46,3 +55,20 @@ jobs:
         run: python tests/test_msg215_network_adapters.py
       - name: Run progressive release, plugin, presence and world invariants
         run: python tests/test_msg218_progressive_release.py
+      - name: Run developer plugin-validator invariants
+        run: python tests/test_msg218_plugin_validator.py
+      - name: Validate example plugin and deterministic receipt
+        run: |
+          python tools/validate_8x8_plugin.py examples/plugins/public-status-card/8x8-plugin.json --output /tmp/plugin-a.json
+          python tools/validate_8x8_plugin.py examples/plugins/public-status-card/8x8-plugin.json --output /tmp/plugin-b.json
+          cmp /tmp/plugin-a.json /tmp/plugin-b.json
+          python - <<'PY'
+          import json
+          receipt = json.load(open('/tmp/plugin-a.json'))
+          assert receipt['conformance_score'] == 100
+          assert receipt['default_permission'] == 'DENY'
+          assert receipt['financial_authority'] == 'NONE'
+          assert receipt['eligible_for_catalog_review'] is True
+          assert receipt['external_actions'] == 0
+          print('8X8_PLUGIN_VALIDATOR=PASS')
+          PY

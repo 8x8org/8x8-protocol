@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/schemas/presence/8x8-presence-privacy-v1.schema.json",
+  "title": "8x8 Presence Privacy V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "presence_id",
+    "profile_id",
+    "visibility",
+    "consent",
+    "location",
+    "expires_at"
+  ],
+  "properties": {
+    "schema_version": {"const": "8x8.presence-privacy.v1"},
+    "presence_id": {"type": "string", "pattern": "^[a-zA-Z0-9._:-]{3,128}$"},
+    "profile_id": {"type": "string", "pattern": "^[a-zA-Z0-9._:-]{3,128}$"},
+    "display_handle": {"type": ["string", "null"], "maxLength": 64},
+    "visibility": {"enum": ["HIDDEN", "GLOBAL_ONLY", "COUNTRY", "REGION", "CITY_APPROXIMATE", "PRECISE_TEMPORARY"]},
+    "consent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["granted", "granted_at", "purpose", "revocable"],
+      "properties": {
+        "granted": {"type": "boolean"},
+        "granted_at": {"type": ["string", "null"], "format": "date-time"},
+        "purpose": {"enum": ["COMMUNITY_MAP", "MATCHMAKING", "EVENT", "SUPPORT", "OTHER"]},
+        "revocable": {"const": true}
+      }
+    },
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["country_code", "region_code", "city_label", "latitude", "longitude", "precision_meters", "source"],
+      "properties": {
+        "country_code": {"type": ["string", "null"], "pattern": "^[A-Z]{2}$"},
+        "region_code": {"type": ["string", "null"], "maxLength": 64},
+        "city_label": {"type": ["string", "null"], "maxLength": 128},
+        "latitude": {"type": ["number", "null"], "minimum": -90, "maximum": 90},
+        "longitude": {"type": ["number", "null"], "minimum": -180, "maximum": 180},
+        "precision_meters": {"type": ["integer", "null"], "minimum": 1},
+        "source": {"enum": ["USER_SELECTED", "DEVICE_APPROXIMATE", "DEVICE_PRECISE", "NETWORK_APPROXIMATE", "NONE"]}
+      }
+    },
+    "presence_state": {"enum": ["ONLINE", "AWAY", "BUSY", "OFFLINE", "UNKNOWN"]},
+    "activity_class": {"enum": ["NONE", "LEARNING", "BUILDING", "PLAYING", "CREATING", "COLLABORATING", "SUPPORT", "UNKNOWN"]},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "last_updated_at": {"type": "string", "format": "date-time"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"visibility": {"const": "HIDDEN"}}},
+      "then": {
+        "properties": {
+          "location": {
+            "properties": {
+              "country_code": {"type": "null"},
+              "region_code": {"type": "null"},
+              "city_label": {"type": "null"},
+              "latitude": {"type": "null"},
+              "longitude": {"type": "null"},
+              "precision_meters": {"type": "null"},
+              "source": {"const": "NONE"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"visibility": {"enum": ["GLOBAL_ONLY", "COUNTRY", "REGION", "CITY_APPROXIMATE"]}}},
+      "then": {
+        "properties": {
+          "location": {
+            "properties": {
+              "latitude": {"type": "null"},
+              "longitude": {"type": "null"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"visibility": {"const": "PRECISE_TEMPORARY"}}},
+      "then": {
+        "properties": {
+          "consent": {"properties": {"granted": {"const": true}}},
+          "location": {
+            "required": ["latitude", "longitude", "precision_meters"],
+            "properties": {
+              "latitude": {"type": "number"},
+              "longitude": {"type": "number"},
+              "precision_meters": {"type": "integer", "maximum": 1000},
+              "source": {"enum": ["USER_SELECTED", "DEVICE_PRECISE"]}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"consent": {"properties": {"granted": {"const": false}}}}},
+      "then": {"properties": {"visibility": {"const": "HIDDEN"}}}
+    }
+  ]
+}

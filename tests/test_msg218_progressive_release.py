@@ -4,6 +4,7 @@ import copy
 import json
 import re
 import unittest
+from datetime import datetime
 from pathlib import Path
 
 from jsonschema import Draft202012Validator, FormatChecker
@@ -19,6 +20,19 @@ SCHEMAS = {
     "capability_registry": ROOT / "schemas/runtime/8x8-capability-registry-v1.schema.json",
 }
 
+STRICT_FORMAT_CHECKER = FormatChecker()
+
+
+@STRICT_FORMAT_CHECKER.checks("date-time")
+def is_timezone_aware_datetime(value):
+    if not isinstance(value, str):
+        return True
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return parsed.tzinfo is not None
+
 
 class ProgressiveReleaseContracts(unittest.TestCase):
     @classmethod
@@ -29,7 +43,7 @@ class ProgressiveReleaseContracts(unittest.TestCase):
             for name, path in SCHEMAS.items()
         }
         cls.validators = {
-            name: Draft202012Validator(schema, format_checker=FormatChecker())
+            name: Draft202012Validator(schema, format_checker=STRICT_FORMAT_CHECKER)
             for name, schema in cls.schema_documents.items()
         }
 

@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/schemas/entitlement-v1.schema.json",
+  "title": "8x8 Entitlement V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "entitlement_id",
+    "subject_id",
+    "product_id",
+    "status",
+    "trial",
+    "paid_plan",
+    "usage",
+    "issued_at",
+    "evidence"
+  ],
+  "properties": {
+    "schema_version": { "const": "8x8.entitlement.v1" },
+    "entitlement_id": {
+      "type": "string",
+      "pattern": "^ent_[A-Za-z0-9_-]{16,96}$"
+    },
+    "subject_id": {
+      "type": "string",
+      "pattern": "^sub_[A-Za-z0-9_-]{8,96}$"
+    },
+    "product_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]{3,96}$"
+    },
+    "status": {
+      "enum": [
+        "TRIAL_NOT_STARTED",
+        "TRIAL_ACTIVE",
+        "TRIAL_EXHAUSTED",
+        "PAYMENT_PENDING",
+        "PAID_ACTIVE",
+        "PAST_DUE",
+        "SUSPENDED",
+        "EXPIRED",
+        "REVOKED"
+      ]
+    },
+    "trial": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "included_seconds",
+        "starts_at",
+        "expires_at",
+        "consumed_seconds",
+        "clock_source",
+        "anti_abuse_state"
+      ],
+      "properties": {
+        "included_seconds": { "const": 5280 },
+        "starts_at": { "type": ["string", "null"], "format": "date-time" },
+        "expires_at": { "type": ["string", "null"], "format": "date-time" },
+        "consumed_seconds": { "type": "integer", "minimum": 0, "maximum": 5280 },
+        "clock_source": { "enum": ["SERVER_MONOTONIC", "SIGNED_USAGE_RECEIPTS"] },
+        "anti_abuse_state": {
+          "enum": ["CLEAR", "RATE_LIMITED", "DUPLICATE_IDENTITY_REVIEW", "BLOCKED"]
+        }
+      }
+    },
+    "paid_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["price", "currency", "billing_period", "production_approved"],
+      "properties": {
+        "price": { "const": "8.88" },
+        "currency": { "const": "USD" },
+        "billing_period": {
+          "type": ["string", "null"],
+          "enum": [null, "ONE_TIME", "MONTHLY", "QUARTERLY", "YEARLY", "USAGE_PACK"]
+        },
+        "production_approved": { "const": false }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["meter_version", "units", "receipt_required"],
+      "properties": {
+        "meter_version": { "const": "8x8.usage-meter.v1" },
+        "units": { "enum": ["SECONDS", "TOKENS", "TASKS", "COMPUTE_CREDITS"] },
+        "receipt_required": { "const": true }
+      }
+    },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_digest", "receipt_id"],
+      "properties": {
+        "source_digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "receipt_id": { "type": "string", "minLength": 8, "maxLength": 128 }
+      }
+    }
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/schemas/runtime/8x8-capability-registry-v1.schema.json",
+  "title": "8x8 Model and Agent Capability Registry V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "generated_at", "models", "agents", "truth_policy"],
+  "$defs": {
+    "evidence_ref": {
+      "type": "string",
+      "maxLength": 512,
+      "pattern": "^(?:commit:[0-9a-f]{40}|sha256:[0-9a-f]{64}|(?:receipt|source|artifact|registry):[A-Za-z0-9][A-Za-z0-9._:/@+-]{2,509})$"
+    },
+    "receipt_ref": {
+      "type": "string",
+      "maxLength": 512,
+      "pattern": "^receipt:[A-Za-z0-9][A-Za-z0-9._:/@+-]{2,503}$"
+    }
+  },
+  "properties": {
+    "schema_version": {"const": "8x8.capability-registry.v1"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "models": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["model_id", "provider", "runtime", "capabilities", "status", "evidence"],
+        "properties": {
+          "model_id": {"type": "string", "maxLength": 192},
+          "provider": {"type": "string", "maxLength": 96},
+          "runtime": {"type": "string", "maxLength": 96},
+          "context_window": {"type": ["integer", "null"], "minimum": 1},
+          "modalities": {
+            "type": "array",
+            "items": {"enum": ["TEXT", "IMAGE_INPUT", "IMAGE_OUTPUT", "AUDIO_INPUT", "AUDIO_OUTPUT", "VIDEO_INPUT", "VIDEO_OUTPUT", "EMBEDDING", "TOOLS"]},
+            "uniqueItems": true
+          },
+          "capabilities": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$"},
+            "uniqueItems": true
+          },
+          "cost_class": {"enum": ["LOCAL_FREE", "REMOTE_FREE", "METERED", "PAID", "UNKNOWN"]},
+          "privacy_class": {"enum": ["LOCAL_PRIVATE", "REMOTE_REDACTED", "REMOTE_PRIVATE_CONTRACT", "PUBLIC_ONLY", "UNKNOWN"]},
+          "status": {"enum": ["VERIFIED_RUNNING", "VERIFIED_INSTALLED", "OWNER_CONFIRMED", "SOURCE_PRESENT", "STALE", "UNREACHABLE", "NOT_FOUND_IN_SCANNED_SCOPE", "BLOCKED"]},
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"$ref": "#/$defs/evidence_ref"}
+          }
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"status": {"const": "VERIFIED_RUNNING"}}, "required": ["status"]},
+            "then": {
+              "properties": {
+                "evidence": {
+                  "contains": {"$ref": "#/$defs/receipt_ref"},
+                  "minContains": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "agents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["agent_id", "display_name", "role", "authority_ceiling", "status", "capabilities", "evidence"],
+        "properties": {
+          "agent_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$"},
+          "display_name": {"type": "string", "maxLength": 96},
+          "role": {"type": "string", "maxLength": 128},
+          "emoji": {"type": ["string", "null"], "maxLength": 16},
+          "avatar_ref": {"type": ["string", "null"], "maxLength": 512},
+          "model_routes": {
+            "type": "array",
+            "items": {"type": "string", "maxLength": 192},
+            "uniqueItems": true
+          },
+          "authority_ceiling": {"enum": ["L0", "L1", "L2", "L3", "L4", "L5", "L6", "A2_OWNER_ONLY"]},
+          "capabilities": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$"},
+            "uniqueItems": true
+          },
+          "status": {"enum": ["VERIFIED_ACTIVE", "VERIFIED_IDLE", "SERVICE_PRESENT", "PERSONA_ONLY", "DESIGNED_BODY", "STALE", "BLOCKED", "UNKNOWN"]},
+          "productive_receipt_ref": {"type": ["string", "null"], "maxLength": 512},
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"$ref": "#/$defs/evidence_ref"}
+          }
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"status": {"const": "VERIFIED_ACTIVE"}}, "required": ["status"]},
+            "then": {
+              "required": ["productive_receipt_ref"],
+              "properties": {
+                "productive_receipt_ref": {"$ref": "#/$defs/receipt_ref"},
+                "evidence": {
+                  "contains": {"$ref": "#/$defs/receipt_ref"},
+                  "minContains": 1
+                }
+              }
+            }
+          },
+          {
+            "if": {"properties": {"status": {"const": "PERSONA_ONLY"}}, "required": ["status"]},
+            "then": {
+              "properties": {"productive_receipt_ref": {"type": "null"}}
+            }
+          }
+        ]
+      }
+    },
+    "truth_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["counts_require_records", "persona_is_not_runtime", "model_label_is_not_liveness", "receipt_required_for_productive_claim"],
+      "properties": {
+        "counts_require_records": {"const": true},
+        "persona_is_not_runtime": {"const": true},
+        "model_label_is_not_liveness": {"const": true},
+        "receipt_required_for_productive_claim": {"const": true}
+      }
+    }
+  }
+}

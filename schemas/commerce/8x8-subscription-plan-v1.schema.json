@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/schemas/commerce/8x8-subscription-plan-v1.schema.json",
+  "title": "8x8 Subscription Plan V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "plan_id",
+    "monthly_unit_usd",
+    "total_price_usd",
+    "billing_months",
+    "trial_seconds",
+    "entitlement_policy",
+    "renewal_policy",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {"const": "8x8.subscription-plan.v1"},
+    "plan_id": {
+      "enum": ["TRIAL_88_MIN", "PAID_1_MONTH", "PAID_3_MONTH", "PAID_6_MONTH", "PAID_9_MONTH", "PAID_12_MONTH"]
+    },
+    "monthly_unit_usd": {"type": "string", "pattern": "^[0-9]+(\\.[0-9]{2})$"},
+    "total_price_usd": {"type": "string", "pattern": "^[0-9]+(\\.[0-9]{2})$"},
+    "billing_months": {"enum": [0, 1, 3, 6, 9, 12]},
+    "trial_seconds": {"enum": [0, 5280]},
+    "discount_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["applied", "authorization_ref"],
+      "properties": {
+        "applied": {"const": false},
+        "authorization_ref": {"type": ["string", "null"], "maxLength": 256}
+      }
+    },
+    "entitlement_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["meter_source", "concurrent_session_limit", "server_authoritative"],
+      "properties": {
+        "meter_source": {"enum": ["SERVER_ACTIVE_SECONDS", "SERVER_TASK_SECONDS", "HYBRID_SERVER_METER"]},
+        "concurrent_session_limit": {"type": "integer", "minimum": 1, "maximum": 8},
+        "server_authoritative": {"const": true},
+        "offline_grace_seconds": {"type": "integer", "minimum": 0, "maximum": 3600},
+        "feature_scopes": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._:-]{2,95}$"},
+          "uniqueItems": true
+        }
+      }
+    },
+    "renewal_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["automatic", "notice_days", "cancel_anytime"],
+      "properties": {
+        "automatic": {"type": "boolean"},
+        "notice_days": {"type": "integer", "minimum": 0, "maximum": 30},
+        "cancel_anytime": {"type": "boolean"},
+        "proration": {"enum": ["NONE", "CREDIT_ONLY", "FULL"]}
+      }
+    },
+    "payment_methods": {
+      "type": "array",
+      "items": {
+        "enum": ["CARD_PROCESSOR", "BTC", "XMR", "ETH", "BNB_SMART_CHAIN", "SOLANA", "TON", "PI_NETWORK", "STABLECOIN"]
+      },
+      "uniqueItems": true
+    },
+    "status": {"enum": ["DESIGN_ONLY", "TEST_MODE", "PRIVATE_BETA", "PUBLIC_BETA", "PRODUCTION_APPROVED", "SUSPENDED"]},
+    "legal_review": {"enum": ["NOT_STARTED", "IN_REVIEW", "PASS", "BLOCKED"]},
+    "tax_review": {"enum": ["NOT_STARTED", "IN_REVIEW", "PASS", "BLOCKED"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"plan_id": {"const": "TRIAL_88_MIN"}}},
+      "then": {"properties": {"monthly_unit_usd": {"const": "0.00"}, "total_price_usd": {"const": "0.00"}, "billing_months": {"const": 0}, "trial_seconds": {"const": 5280}}}
+    },
+    {
+      "if": {"properties": {"plan_id": {"const": "PAID_1_MONTH"}}},
+      "then": {"properties": {"monthly_unit_usd": {"const": "8.88"}, "total_price_usd": {"const": "8.88"}, "billing_months": {"const": 1}, "trial_seconds": {"const": 0}}}
+    },
+    {
+      "if": {"properties": {"plan_id": {"const": "PAID_3_MONTH"}}},
+      "then": {"properties": {"monthly_unit_usd": {"const": "8.88"}, "total_price_usd": {"const": "26.64"}, "billing_months": {"const": 3}, "trial_seconds": {"const": 0}}}
+    },
+    {
+      "if": {"properties": {"plan_id": {"const": "PAID_6_MONTH"}}},
+      "then": {"properties": {"monthly_unit_usd": {"const": "8.88"}, "total_price_usd": {"const": "53.28"}, "billing_months": {"const": 6}, "trial_seconds": {"const": 0}}}
+    },
+    {
+      "if": {"properties": {"plan_id": {"const": "PAID_9_MONTH"}}},
+      "then": {"properties": {"monthly_unit_usd": {"const": "8.88"}, "total_price_usd": {"const": "79.92"}, "billing_months": {"const": 9}, "trial_seconds": {"const": 0}}}
+    },
+    {
+      "if": {"properties": {"plan_id": {"const": "PAID_12_MONTH"}}},
+      "then": {"properties": {"monthly_unit_usd": {"const": "8.88"}, "total_price_usd": {"const": "106.56"}, "billing_months": {"const": 12}, "trial_seconds": {"const": 0}}}
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/schemas/connectors/8x8-discord-connector-v1.schema.json",
+  "title": "8x8 Discord Connector V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "connector_id",
+    "installation_scope",
+    "capabilities",
+    "authority",
+    "privacy",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {"const": "8x8.discord-connector.v1"},
+    "connector_id": {"type": "string", "pattern": "^discord:[A-Za-z0-9._-]{3,96}$"},
+    "installation_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["guild_ref", "channel_allowlist"],
+      "properties": {
+        "guild_ref": {"type": "string", "maxLength": 128},
+        "channel_allowlist": {
+          "type": "array",
+          "items": {"type": "string", "maxLength": 128},
+          "uniqueItems": true
+        },
+        "thread_allowlist": {
+          "type": "array",
+          "items": {"type": "string", "maxLength": 128},
+          "uniqueItems": true
+        }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "READ_MENTIONS",
+          "READ_ALLOWED_CHANNELS",
+          "POST_REPLY_DRAFT",
+          "POST_APPROVED_MESSAGE",
+          "CREATE_APPROVED_THREAD",
+          "ATTACH_APPROVED_ARTIFACT",
+          "EMIT_RECEIPT",
+          "MODERATION_PROPOSAL"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default_mode", "public_post_requires_gate", "dm_requires_gate", "admin_actions_forbidden"],
+      "properties": {
+        "default_mode": {"enum": ["READ_ONLY", "DRAFT_ONLY", "OWNER_GATED_WRITE"]},
+        "public_post_requires_gate": {"const": true},
+        "dm_requires_gate": {"const": true},
+        "admin_actions_forbidden": {"const": true},
+        "financial_actions_forbidden": {"const": true},
+        "credential_export_forbidden": {"const": true}
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["store_message_body", "store_private_dm_body", "redaction_required"],
+      "properties": {
+        "store_message_body": {"type": "boolean", "default": false},
+        "store_private_dm_body": {"const": false},
+        "redaction_required": {"const": true},
+        "retention_days": {"type": "integer", "minimum": 0, "maximum": 365}
+      }
+    },
+    "receipt_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "message_id_required": {"type": "boolean", "default": true},
+        "channel_ref_required": {"type": "boolean", "default": true},
+        "content_sha256_required": {"type": "boolean", "default": true},
+        "actor_identity_required": {"type": "boolean", "default": true}
+      }
+    },
+    "status": {"enum": ["DESIGN_ONLY", "CONFIG_PRESENT", "READ_ONLY_CANARY", "OWNER_GATED_CANARY", "PRIVATE_BETA", "PRODUCTION_APPROVED", "REVOKED"]}
+  }
+}

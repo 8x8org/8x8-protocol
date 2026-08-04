@@ -1,0 +1,127 @@
+{
+  "pricing": {
+    "monthly_unit_usd": "8.88",
+    "expected_totals": {"1": "8.88", "3": "26.64", "6": "53.28", "9": "79.92", "12": "106.56"}
+  },
+  "positive": {
+    "user_profile": {
+      "schema_version": "8x8.user-profile.v1",
+      "profile_id": "8X8-ABCD2345",
+      "handle": "flash_user",
+      "display_name": "Flash User",
+      "email_state": "VERIFIED",
+      "credential_state": "PASSKEY_ACTIVE",
+      "account_state": "ACTIVE_TRIAL",
+      "created_at": "2026-08-04T12:00:00Z",
+      "privacy": {"profile_visibility": "PRIVATE", "public_handle_visible": true, "legal_name_public": false},
+      "identity_links": [{"provider": "PASSKEY", "state": "VERIFIED", "subject_ref": null}]
+    },
+    "subscriptions": [
+      {"plan_id": "TRIAL_88_MIN", "price_usd": "0.00", "billing_months": 0, "trial_seconds": 5280},
+      {"plan_id": "PAID_1_MONTH", "price_usd": "8.88", "billing_months": 1, "trial_seconds": 0},
+      {"plan_id": "PAID_3_MONTH", "price_usd": "26.64", "billing_months": 3, "trial_seconds": 0},
+      {"plan_id": "PAID_6_MONTH", "price_usd": "53.28", "billing_months": 6, "trial_seconds": 0},
+      {"plan_id": "PAID_9_MONTH", "price_usd": "79.92", "billing_months": 9, "trial_seconds": 0},
+      {"plan_id": "PAID_12_MONTH", "price_usd": "106.56", "billing_months": 12, "trial_seconds": 0}
+    ],
+    "discord": {
+      "default_mode": "DRAFT_ONLY",
+      "public_post_requires_gate": true,
+      "dm_requires_gate": true,
+      "admin_actions_forbidden": true,
+      "financial_actions_forbidden": true,
+      "credential_export_forbidden": true,
+      "store_private_dm_body": false,
+      "redaction_required": true,
+      "channel_allowlist": ["channel:approved"],
+      "capabilities": ["READ_MENTIONS", "POST_REPLY_DRAFT", "EMIT_RECEIPT"]
+    },
+    "registry": {
+      "models": [
+        {"model_id": "local:vision:moondream2", "status": "VERIFIED_INSTALLED", "evidence": ["sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"]}
+      ],
+      "agents": [
+        {"agent_id": "agent:hermes", "status": "VERIFIED_ACTIVE", "evidence": ["receipt:hermes-heartbeat"], "productive_receipt_ref": "receipt:hermes-task-001"},
+        {"agent_id": "agent:seraphim", "status": "PERSONA_ONLY", "evidence": ["source:soul-file"], "productive_receipt_ref": null}
+      ]
+    },
+    "private_projection": {
+      "public_fields": ["capability_id", "display_name", "availability", "sanitized_result", "receipt_digest"],
+      "restricted_fields": ["private_prompt", "memory_payload", "credential_material", "wallet_authority", "owner_topology", "filesystem_path"]
+    },
+    "auth_security": {
+      "password_storage": "ARGON2ID_OR_EQUIVALENT",
+      "plaintext_password_forbidden": true,
+      "passkey_secret_material_server_stored": false,
+      "recovery_token_single_use": true,
+      "session_revocation_supported": true,
+      "anti_replay_nonce_required": true,
+      "multi_account_abuse_detection": true,
+      "sensitive_log_redaction": true
+    },
+    "payment_design": {
+      "BTC": "WATCH_ONLY_OR_RECEIVE_ONLY",
+      "XMR": "VIEW_ONLY_AND_UNIQUE_SUBADDRESS",
+      "spend_authority_in_public_service": false,
+      "live_actions": false
+    },
+    "cryptographic_receipt": {
+      "schema_version": "8x8.cryptographic-receipt.v1",
+      "receipt_id": "receipt:msg215-fixture-001",
+      "subject_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "digest_algorithm": "SHA-256",
+      "signature_state": "SIGNED_VERIFIED",
+      "signature": {
+        "scheme": "SIGSTORE_KEYLESS",
+        "key_id": "fulcio:example-identity",
+        "signature_ref": "sigstore:bundle:msg215-fixture-001",
+        "verified_at": "2026-08-04T13:30:00Z"
+      },
+      "provenance": {
+        "source_uri": "https://github.com/8x8org/8x8-protocol",
+        "source_commit": "58997cb0cbce7be1286e1b8af16774ca3510aec2",
+        "builder_id": "github-actions:msg215-protocol-contracts",
+        "invocation_id": "workflow-run:fixture",
+        "slsa_level": 1,
+        "in_toto_statement_ref": "in-toto:statement:msg215-fixture-001"
+      },
+      "supply_chain": {
+        "tuf_metadata_state": "VERIFIED",
+        "sbom_state": "CYCLONEDX_VERIFIED",
+        "sigstore_state": "VERIFIED",
+        "c2pa_state": "NOT_APPLICABLE"
+      },
+      "privacy": {
+        "contains_secrets": false,
+        "contains_private_payload": false,
+        "redaction_state": "NOT_REQUIRED"
+      },
+      "created_at": "2026-08-04T13:30:00Z"
+    }
+  },
+  "negative": {
+    "duplicate_model_ids": ["model:x", "model:x"],
+    "duplicate_agent_ids": ["agent:x", "agent:x"],
+    "malformed_evidence_refs": ["sha256:model-manifest", "receipt:", "plain-text-claim"],
+    "running_model_without_receipt": {"model_id": "model:fiction", "status": "VERIFIED_RUNNING", "evidence": ["source:model-card"]},
+    "persona_claimed_active_without_receipt": {"agent_id": "agent:fiction", "status": "VERIFIED_ACTIVE", "evidence": ["source:soul-file"], "productive_receipt_ref": null},
+    "discord_unsafe": {"default_mode": "OWNER_GATED_WRITE", "public_post_requires_gate": false, "dm_requires_gate": false, "admin_actions_forbidden": false, "store_private_dm_body": true},
+    "trial_wrong_seconds": 5279,
+    "discount_invented_total": {"billing_months": 12, "price_usd": "88.88"},
+    "private_projection_leak": ["capability_id", "private_prompt"],
+    "auth_unsafe": {"password_storage": "PLAINTEXT", "recovery_token_single_use": false, "anti_replay_nonce_required": false},
+    "wallet_unsafe": {"spend_authority_in_public_service": true, "live_actions": true},
+    "hash_mislabeled_signature": {
+      "subject_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "signature_state": "SIGNED_VERIFIED",
+      "signature": null
+    },
+    "provenance_unsafe": {
+      "source_commit": "not-a-commit",
+      "contains_secrets": true,
+      "contains_private_payload": true,
+      "sigstore_state": "INVALID",
+      "tuf_metadata_state": "INVALID"
+    }
+  }
+}

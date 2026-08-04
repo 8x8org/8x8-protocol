@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/schemas/payment-intent-v1.schema.json",
+  "title": "8x8 Payment Intent V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "payment_intent_id",
+    "entitlement_id",
+    "merchant_id",
+    "quote",
+    "payment_options",
+    "status",
+    "created_at",
+    "expires_at",
+    "financial_authority",
+    "evidence"
+  ],
+  "properties": {
+    "schema_version": { "const": "8x8.payment-intent.v1" },
+    "payment_intent_id": {
+      "type": "string",
+      "pattern": "^pay_[A-Za-z0-9_-]{16,96}$"
+    },
+    "entitlement_id": {
+      "type": "string",
+      "pattern": "^ent_[A-Za-z0-9_-]{16,96}$"
+    },
+    "merchant_id": {
+      "type": "string",
+      "pattern": "^mer_[A-Za-z0-9_-]{8,96}$"
+    },
+    "quote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "currency", "billing_period", "quote_source"],
+      "properties": {
+        "amount": { "const": "8.88" },
+        "currency": { "const": "USD" },
+        "billing_period": {
+          "type": ["string", "null"],
+          "enum": [null, "ONE_TIME", "MONTHLY", "QUARTERLY", "YEARLY", "USAGE_PACK"]
+        },
+        "quote_source": { "enum": ["FIXED_PLAN_PRICE", "SIGNED_PRICE_ORACLE"] }
+      }
+    },
+    "payment_options": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "option_id",
+          "network",
+          "asset",
+          "amount_due",
+          "destination_reference",
+          "confirmation_policy",
+          "settlement_policy_id",
+          "enabled"
+        ],
+        "properties": {
+          "option_id": { "type": "string", "pattern": "^opt_[A-Za-z0-9_-]{8,96}$" },
+          "network": {
+            "enum": [
+              "BITCOIN",
+              "MONERO",
+              "ETHEREUM",
+              "BNB_SMART_CHAIN",
+              "SOLANA",
+              "TON",
+              "PI_NETWORK"
+            ]
+          },
+          "asset": { "type": "string", "pattern": "^[A-Z0-9._-]{2,20}$" },
+          "amount_due": { "type": "string", "pattern": "^(0|[0-9]+(\\.[0-9]{1,18})?)$" },
+          "destination_reference": {
+            "type": "string",
+            "pattern": "^wref_[A-Za-z0-9_-]{8,128}$"
+          },
+          "confirmation_policy": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["minimum_confirmations", "zero_confirmation_allowed"],
+            "properties": {
+              "minimum_confirmations": { "type": "integer", "minimum": 0, "maximum": 100 },
+              "zero_confirmation_allowed": { "const": false }
+            }
+          },
+          "settlement_policy_id": {
+            "type": "string",
+            "pattern": "^set_[A-Za-z0-9_-]{8,96}$"
+          },
+          "enabled": { "type": "boolean" }
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "CREATED",
+        "AWAITING_PAYMENT",
+        "PARTIALLY_PAID",
+        "CONFIRMING",
+        "SETTLED",
+        "EXPIRED",
+        "UNDERPAID",
+        "OVERPAID_REVIEW",
+        "REFUND_REVIEW",
+        "FAILED",
+        "CANCELLED"
+      ]
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "financial_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["custodial", "private_key_available_to_application", "automatic_swap", "automatic_payout"],
+      "properties": {
+        "custodial": { "const": false },
+        "private_key_available_to_application": { "const": false },
+        "automatic_swap": { "const": false },
+        "automatic_payout": { "const": false }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["receipt_required", "source_digest"],
+      "properties": {
+        "receipt_required": { "const": true },
+        "source_digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    }
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/schemas/settlement-policy-v1.schema.json",
+  "title": "8x8 Settlement Policy V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "settlement_policy_id",
+    "accepted_networks",
+    "preferred_settlement_assets",
+    "conversion",
+    "treasury_destination",
+    "agent_wallet_policy",
+    "compliance",
+    "status"
+  ],
+  "properties": {
+    "schema_version": { "const": "8x8.settlement-policy.v1" },
+    "settlement_policy_id": {
+      "type": "string",
+      "pattern": "^set_[A-Za-z0-9_-]{8,96}$"
+    },
+    "accepted_networks": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "BITCOIN",
+          "MONERO",
+          "ETHEREUM",
+          "BNB_SMART_CHAIN",
+          "SOLANA",
+          "TON",
+          "PI_NETWORK"
+        ]
+      }
+    },
+    "preferred_settlement_assets": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": ["BTC", "XMR", "USDC", "USDT"]
+      }
+    },
+    "conversion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stablecoin_first",
+        "automatic_swap",
+        "automatic_bridge",
+        "quote_required",
+        "maximum_slippage_bps",
+        "exact_gate_required"
+      ],
+      "properties": {
+        "stablecoin_first": { "type": "boolean" },
+        "automatic_swap": { "const": false },
+        "automatic_bridge": { "const": false },
+        "quote_required": { "const": true },
+        "maximum_slippage_bps": { "type": "integer", "minimum": 0, "maximum": 500 },
+        "exact_gate_required": { "const": true }
+      }
+    },
+    "treasury_destination": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["wallet_reference", "custody_controller", "private_key_in_application"],
+      "properties": {
+        "wallet_reference": { "type": "string", "pattern": "^wref_[A-Za-z0-9_-]{8,128}$" },
+        "custody_controller": { "enum": ["OWNER", "OWNER_CONTROLLED_ENTITY"] },
+        "private_key_in_application": { "const": false }
+      }
+    },
+    "agent_wallet_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "independent_agent_ownership",
+        "default_mode",
+        "autonomous_spending",
+        "owner_gate_required",
+        "audit_receipt_required"
+      ],
+      "properties": {
+        "independent_agent_ownership": { "const": false },
+        "default_mode": { "enum": ["WATCH_ONLY", "RECEIVE_ONLY", "INTERNAL_LEDGER_ONLY"] },
+        "autonomous_spending": { "const": false },
+        "owner_gate_required": { "const": true },
+        "audit_receipt_required": { "const": true }
+      }
+    },
+    "compliance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "jurisdiction_review",
+        "tax_accounting_review",
+        "sanctions_screening_policy",
+        "refund_policy",
+        "privacy_review"
+      ],
+      "properties": {
+        "jurisdiction_review": { "enum": ["PENDING", "PASSED", "BLOCKED"] },
+        "tax_accounting_review": { "enum": ["PENDING", "PASSED", "BLOCKED"] },
+        "sanctions_screening_policy": { "enum": ["PENDING", "DEFINED", "NOT_APPLICABLE"] },
+        "refund_policy": { "enum": ["PENDING", "DEFINED"] },
+        "privacy_review": { "enum": ["PENDING", "PASSED", "BLOCKED"] }
+      }
+    },
+    "status": {
+      "enum": ["DESIGN_ONLY", "TESTNET_CANARY", "PRIVATE_CANARY", "PRODUCTION_BLOCKED", "PRODUCTION_APPROVED"]
+    }
+  }
+}

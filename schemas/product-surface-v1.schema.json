@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/schemas/product-surface-v1.schema.json",
+  "title": "8x8 Product Surface V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "surface_id",
+    "surface_type",
+    "audience",
+    "authority_class",
+    "data_classes",
+    "capabilities",
+    "entitlement_policy",
+    "deployment_state",
+    "evidence"
+  ],
+  "properties": {
+    "schema_version": { "const": "8x8.product-surface.v1" },
+    "surface_id": { "type": "string", "pattern": "^surf_[A-Za-z0-9_-]{8,96}$" },
+    "surface_type": {
+      "enum": [
+        "PRIVATE_WEB",
+        "PUBLIC_WEB",
+        "PWA",
+        "ANDROID_APP",
+        "IOS_APP",
+        "CLI",
+        "SDK",
+        "MCP_CONNECTOR",
+        "CHATGPT_APP",
+        "TELEGRAM_MINI_APP",
+        "VR_ENVIRONMENT",
+        "VECTRAS_NODE",
+        "ROM_SHELL"
+      ]
+    },
+    "audience": { "enum": ["OWNER", "TRUSTED_TEAM", "PUBLIC_USER", "DEVELOPER", "AGENT"] },
+    "authority_class": {
+      "enum": ["PRIVATE_OWNER_CONTROL", "PRIVATE_READ_ONLY", "PUBLIC_LEAST_AUTHORITY", "SIMULATION_ONLY"]
+    },
+    "data_classes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "PUBLIC_PRODUCT",
+          "PUBLIC_RECEIPT",
+          "PUBLIC_AGENT_PROFILE",
+          "PRIVATE_OWNER",
+          "PRIVATE_AGENT",
+          "PRIVATE_MEMORY",
+          "PAYMENT_METADATA",
+          "WALLET_PUBLIC_REFERENCE",
+          "SIMULATION",
+          "MAP_REDACTED"
+        ]
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "AUTHENTICATE",
+          "VIEW_STATUS",
+          "SUBMIT_TASK",
+          "VIEW_RECEIPT",
+          "CREATE_ARTIFACT",
+          "VIEW_WORLD",
+          "VIEW_MAP",
+          "SUBMIT_SIMULATION",
+          "VIEW_USAGE",
+          "CREATE_PAYMENT_INTENT",
+          "OWNER_APPROVE",
+          "OWNER_CONTROL"
+        ]
+      }
+    },
+    "entitlement_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "trial_seconds", "paid_price_usd"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "trial_seconds": { "type": "integer", "enum": [0, 5280] },
+        "paid_price_usd": { "type": ["string", "null"], "enum": [null, "8.88"] }
+      }
+    },
+    "deployment_state": {
+      "enum": [
+        "DESIGN_ONLY",
+        "SOURCE_PRESENT",
+        "LOCAL_CANARY",
+        "PREVIEW_DEPLOYED",
+        "PRIVATE_BETA",
+        "PUBLIC_BETA",
+        "PRODUCTION_BLOCKED",
+        "PRODUCTION_APPROVED"
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_reference", "source_digest", "last_verified_at"],
+      "properties": {
+        "source_reference": { "type": "string", "minLength": 3, "maxLength": 255 },
+        "source_digest": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+        "last_verified_at": { "type": ["string", "null"], "format": "date-time" }
+      }
+    }
+  }
+}

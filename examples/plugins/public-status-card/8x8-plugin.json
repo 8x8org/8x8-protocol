@@ -1,0 +1,60 @@
+{
+  "schema_version": "8x8.plugin-manifest.v1",
+  "plugin_id": "community.public-status-card",
+  "name": "Public Status Card",
+  "version": "1.0.0",
+  "8x8_label": "8x8-compatible",
+  "description": "Read-only web component that renders public world-node status.",
+  "runtime": {
+    "class": "WEB_COMPONENT",
+    "entrypoint": "dist/status-card.js",
+    "interface_version": "8x8.public-widget.v1",
+    "artifact_digest": "3333333333333333333333333333333333333333333333333333333333333333"
+  },
+  "capabilities": {
+    "imports": ["8x8.public.world-node.read"],
+    "exports": ["8x8.public.widget.render"]
+  },
+  "permissions": {
+    "default": "DENY",
+    "filesystem": [],
+    "network": [],
+    "secrets": [],
+    "messages": "NONE",
+    "financial": "NONE",
+    "service_control": "NONE"
+  },
+  "resources": {
+    "cpu_millis": 100,
+    "memory_mib": 32,
+    "storage_mib": 1,
+    "timeout_seconds": 5,
+    "network_requests_per_minute": 0
+  },
+  "data": {
+    "input_classes": ["PUBLIC"],
+    "output_classes": ["PUBLIC"],
+    "retention": "NONE"
+  },
+  "provenance": {
+    "source_repository": "https://github.com/example/public-status-card",
+    "source_commit": "4444444444444444444444444444444444444444",
+    "license": "Apache-2.0",
+    "sbom": "sbom.cdx.json",
+    "signature": "sigstore:bundle.json",
+    "upstream_project": null,
+    "upstream_license": null,
+    "modification_notice": null
+  },
+  "tests": {
+    "contract": true,
+    "security": true,
+    "resource": true,
+    "rollback": true,
+    "conformance_score": 100
+  },
+  "rollback": {
+    "strategy": "Remove the plugin manifest and restore the prior catalog digest.",
+    "tested": true
+  }
+}

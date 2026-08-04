@@ -1,0 +1,167 @@
+{
+  "release_unit": {
+    "schema_version": "8x8.release-unit.v1",
+    "release_unit_id": "public-global-art-board-v1",
+    "name": "8x8 Global Art Board Public Slice",
+    "description": "Static public-safe spatial status and documentation client.",
+    "scope_basis_points": 100,
+    "truth_state": "RELEASE_ELIGIBLE",
+    "score": {
+      "earned": 100,
+      "possible": 100,
+      "evaluator_version": "8x8.release-evaluator.v1",
+      "evidence_digest": "1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    "public_safe": true,
+    "privacy_class": "PUBLIC_SANITIZED",
+    "dependencies": [],
+    "artifacts": [
+      {
+        "path": "art-board/index.html",
+        "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+        "media_type": "text/html",
+        "sbom_reference": null,
+        "provenance_reference": "github-actions:public-art-board-v1"
+      }
+    ],
+    "gates": {
+      "tests_pass": true,
+      "security_pass": true,
+      "privacy_pass": true,
+      "accessibility_pass": true,
+      "rollback_pass": true,
+      "dependency_pass": true,
+      "exact_target_resolved": true
+    },
+    "target": {
+      "class": "PUBLIC_STATIC",
+      "identifier": "8x8-user-edition/art-board",
+      "visibility": "PUBLIC",
+      "region": null,
+      "budget_ceiling_usd": 0
+    },
+    "rollback": {
+      "strategy": "Revert exact release commit and restore previous static artifact.",
+      "tested": true,
+      "receipt_id": "receipt-art-board-rollback-v1"
+    },
+    "released_at": null,
+    "release_receipt_id": null
+  },
+  "plugin": {
+    "schema_version": "8x8.plugin-manifest.v1",
+    "plugin_id": "community.public-status-card",
+    "name": "Public Status Card",
+    "version": "1.0.0",
+    "8x8_label": "8x8-compatible",
+    "description": "Read-only public status visualization component.",
+    "runtime": {
+      "class": "WEB_COMPONENT",
+      "entrypoint": "dist/status-card.js",
+      "interface_version": "8x8.public-widget.v1",
+      "artifact_digest": "3333333333333333333333333333333333333333333333333333333333333333"
+    },
+    "capabilities": {
+      "imports": ["8x8.public.world-node.read"],
+      "exports": ["8x8.public.widget.render"]
+    },
+    "permissions": {
+      "default": "DENY",
+      "filesystem": [],
+      "network": [],
+      "secrets": [],
+      "messages": "NONE",
+      "financial": "NONE",
+      "service_control": "NONE"
+    },
+    "resources": {
+      "cpu_millis": 100,
+      "memory_mib": 32,
+      "storage_mib": 1,
+      "timeout_seconds": 5,
+      "network_requests_per_minute": 0
+    },
+    "data": {
+      "input_classes": ["PUBLIC"],
+      "output_classes": ["PUBLIC"],
+      "retention": "NONE"
+    },
+    "provenance": {
+      "source_repository": "https://github.com/example/public-status-card",
+      "source_commit": "4444444444444444444444444444444444444444",
+      "license": "Apache-2.0",
+      "sbom": "sbom.cdx.json",
+      "signature": "sigstore:bundle.json",
+      "upstream_project": null,
+      "upstream_license": null,
+      "modification_notice": null
+    },
+    "tests": {
+      "contract": true,
+      "security": true,
+      "resource": true,
+      "rollback": true,
+      "conformance_score": 100
+    },
+    "rollback": {
+      "strategy": "Remove plugin manifest and restore previous catalog digest.",
+      "tested": true
+    }
+  },
+  "hidden_presence": {
+    "schema_version": "8x8.presence-privacy.v1",
+    "presence_id": "presence:user-demo",
+    "profile_id": "profile:user-demo",
+    "display_handle": null,
+    "visibility": "HIDDEN",
+    "consent": {
+      "granted": false,
+      "granted_at": null,
+      "purpose": "COMMUNITY_MAP",
+      "revocable": true
+    },
+    "location": {
+      "country_code": null,
+      "region_code": null,
+      "city_label": null,
+      "latitude": null,
+      "longitude": null,
+      "precision_meters": null,
+      "source": "NONE"
+    },
+    "presence_state": "OFFLINE",
+    "activity_class": "NONE",
+    "expires_at": "2026-08-05T00:00:00Z",
+    "last_updated_at": "2026-08-04T19:30:00Z"
+  },
+  "world_node": {
+    "schema_version": "8x8.world-node.v1",
+    "node_id": "world:public-product",
+    "node_type": "WORLD",
+    "label": "Public Product",
+    "summary": "Public-safe product releases and evidence.",
+    "status": {
+      "state": "HEALTHY",
+      "color_token": "GREEN",
+      "severity": 0,
+      "freshness": "FRESH",
+      "observed_at": "2026-08-04T19:30:00Z",
+      "evidence_digest": "5555555555555555555555555555555555555555555555555555555555555555"
+    },
+    "evidence_state": "TESTED",
+    "position": {
+      "space": "ART_BOARD",
+      "x": 1,
+      "y": 2,
+      "z": 3,
+      "latitude": null,
+      "longitude": null
+    },
+    "visibility": "PUBLIC",
+    "links": [],
+    "actions": [
+      {"action_id": "inspect", "mode": "INSPECT", "authority": "PUBLIC"},
+      {"action_id": "docs", "mode": "OPEN_DOCS", "authority": "PUBLIC"}
+    ]
+  }
+}

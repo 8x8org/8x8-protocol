@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/schemas/trust/8x8-cryptographic-receipt-v1.schema.json",
+  "title": "8x8 Cryptographic Receipt V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "receipt_id",
+    "subject_digest",
+    "digest_algorithm",
+    "signature_state",
+    "provenance",
+    "supply_chain",
+    "privacy",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {"const": "8x8.cryptographic-receipt.v1"},
+    "receipt_id": {"type": "string", "pattern": "^receipt:[a-z0-9][a-z0-9._:-]{2,127}$"},
+    "subject_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "digest_algorithm": {"const": "SHA-256"},
+    "signature_state": {"enum": ["UNSIGNED_HASH_ONLY", "SIGNED_VERIFIED", "SIGNED_UNVERIFIED", "SIGNATURE_INVALID"]},
+    "signature": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["scheme", "key_id", "signature_ref", "verified_at"],
+      "properties": {
+        "scheme": {"enum": ["ED25519", "ECDSA_P256", "RSA_PSS", "SIGSTORE_KEYLESS"]},
+        "key_id": {"type": "string", "minLength": 3, "maxLength": 255},
+        "signature_ref": {"type": "string", "minLength": 3, "maxLength": 512},
+        "verified_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_uri", "source_commit", "builder_id", "invocation_id"],
+      "properties": {
+        "source_uri": {"type": "string", "minLength": 3, "maxLength": 1024},
+        "source_commit": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+        "builder_id": {"type": "string", "minLength": 3, "maxLength": 255},
+        "invocation_id": {"type": "string", "minLength": 3, "maxLength": 255},
+        "slsa_level": {"type": "integer", "minimum": 0, "maximum": 4},
+        "in_toto_statement_ref": {"type": ["string", "null"], "maxLength": 1024}
+      }
+    },
+    "supply_chain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tuf_metadata_state", "sbom_state", "sigstore_state", "c2pa_state"],
+      "properties": {
+        "tuf_metadata_state": {"enum": ["NOT_APPLICABLE", "PRESENT_UNVERIFIED", "VERIFIED", "INVALID"]},
+        "sbom_state": {"enum": ["NOT_APPLICABLE", "CYCLONEDX_PRESENT", "CYCLONEDX_VERIFIED", "INVALID"]},
+        "sigstore_state": {"enum": ["NOT_APPLICABLE", "BUNDLE_PRESENT", "VERIFIED", "INVALID"]},
+        "c2pa_state": {"enum": ["NOT_APPLICABLE", "MANIFEST_PRESENT", "VERIFIED", "INVALID"]}
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contains_secrets", "contains_private_payload", "redaction_state"],
+      "properties": {
+        "contains_secrets": {"const": false},
+        "contains_private_payload": {"const": false},
+        "redaction_state": {"enum": ["NOT_REQUIRED", "REDACTED_VERIFIED"]}
+      }
+    },
+    "created_at": {"type": "string", "format": "date-time"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"signature_state": {"const": "SIGNED_VERIFIED"}}},
+      "then": {"required": ["signature"], "properties": {"signature": {"type": "object"}}}
+    },
+    {
+      "if": {"properties": {"signature_state": {"const": "UNSIGNED_HASH_ONLY"}}},
+      "then": {"properties": {"signature": {"type": "null"}}}
+    }
+  ]
+}

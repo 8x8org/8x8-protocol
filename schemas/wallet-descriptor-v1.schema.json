@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/schemas/wallet-descriptor-v1.schema.json",
+  "title": "8x8 Wallet Descriptor V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "wallet_id",
+    "network",
+    "wallet_class",
+    "custody_controller",
+    "operating_mode",
+    "public_receive_reference",
+    "secret_material_present",
+    "agent_policy",
+    "status",
+    "evidence"
+  ],
+  "properties": {
+    "schema_version": { "const": "8x8.wallet-descriptor.v1" },
+    "wallet_id": {
+      "type": "string",
+      "pattern": "^wal_[A-Za-z0-9_-]{16,96}$"
+    },
+    "network": {
+      "enum": [
+        "BITCOIN",
+        "MONERO",
+        "ETHEREUM",
+        "BNB_SMART_CHAIN",
+        "SOLANA",
+        "TON",
+        "PI_NETWORK"
+      ]
+    },
+    "asset": {
+      "type": "string",
+      "pattern": "^[A-Z0-9._-]{2,20}$"
+    },
+    "wallet_class": {
+      "enum": [
+        "OWNER_TREASURY",
+        "REVENUE_COLLECTION",
+        "AGENT_POLICY_ACCOUNT",
+        "USER_CONNECTED",
+        "WATCH_ONLY_AUDIT",
+        "TESTNET_CANARY"
+      ]
+    },
+    "custody_controller": {
+      "enum": ["OWNER", "OWNER_CONTROLLED_ENTITY", "EXTERNAL_USER"]
+    },
+    "operating_mode": {
+      "enum": [
+        "WATCH_ONLY",
+        "RECEIVE_ONLY",
+        "OWNER_SIGNED",
+        "MULTISIG_OWNER_GATE",
+        "EXTERNAL_USER_CONTROLLED",
+        "TESTNET_ONLY"
+      ]
+    },
+    "public_receive_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reference_type", "reference_id"],
+      "properties": {
+        "reference_type": {
+          "enum": [
+            "BITCOIN_DESCRIPTOR",
+            "BITCOIN_XPUB_REFERENCE",
+            "MONERO_SUBADDRESS_ACCOUNT",
+            "PUBLIC_ADDRESS_REFERENCE",
+            "EXTERNAL_WALLET_CONNECT_SESSION",
+            "TEST_FIXTURE"
+          ]
+        },
+        "reference_id": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 255
+        }
+      }
+    },
+    "secret_material_present": { "const": false },
+    "agent_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "assigned_agent_id",
+        "independent_legal_ownership",
+        "autonomous_spend",
+        "spend_gate",
+        "daily_limit"
+      ],
+      "properties": {
+        "assigned_agent_id": { "type": ["string", "null"], "maxLength": 128 },
+        "independent_legal_ownership": { "const": false },
+        "autonomous_spend": { "const": false },
+        "spend_gate": {
+          "enum": ["NOT_APPLICABLE", "OWNER_EXACT_GATE", "MULTISIG_OWNER_GATE"]
+        },
+        "daily_limit": {
+          "type": ["string", "null"],
+          "pattern": "^(0|[0-9]+(\\.[0-9]{1,18})?)$"
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "OWNER_CONFIRMED_NOT_INSPECTED",
+        "DESCRIPTOR_VERIFIED",
+        "WATCH_ONLY_ACTIVE",
+        "RECEIVE_ONLY_ACTIVE",
+        "TESTNET_ACTIVE",
+        "DISABLED",
+        "REVOKED",
+        "UNKNOWN"
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["truth_class", "verified_at", "source_digest"],
+      "properties": {
+        "truth_class": {
+          "enum": ["OWNER_CONFIRMED", "SYSTEM_OBSERVED", "CRYPTOGRAPHICALLY_VERIFIED"]
+        },
+        "verified_at": { "type": ["string", "null"], "format": "date-time" },
+        "source_digest": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" }
+      }
+    }
+  }
+}

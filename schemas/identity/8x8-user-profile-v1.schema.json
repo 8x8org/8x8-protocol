@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/schemas/identity/8x8-user-profile-v1.schema.json",
+  "title": "8x8 User Profile V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "profile_id",
+    "handle",
+    "display_name",
+    "email_state",
+    "credential_state",
+    "account_state",
+    "created_at",
+    "privacy"
+  ],
+  "properties": {
+    "schema_version": {"const": "8x8.user-profile.v1"},
+    "profile_id": {
+      "type": "string",
+      "pattern": "^8X8-[A-Z2-9][A-Z2-9-]{7,31}$"
+    },
+    "handle": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.-]{2,31}$"
+    },
+    "display_name": {"type": "string", "minLength": 1, "maxLength": 80},
+    "legal_name": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "first_name": {"type": "string", "maxLength": 80},
+        "last_name": {"type": "string", "maxLength": 80}
+      }
+    },
+    "email_state": {
+      "enum": ["UNSET", "PENDING_VERIFICATION", "VERIFIED", "BOUNCED", "REVOKED"]
+    },
+    "credential_state": {
+      "enum": ["PASSWORD_PENDING", "PASSWORD_ACTIVE", "PASSKEY_ACTIVE", "FEDERATED_ACTIVE", "RECOVERY_REQUIRED", "DISABLED"]
+    },
+    "account_state": {
+      "enum": ["PENDING", "ACTIVE_TRIAL", "ACTIVE_PAID", "PAST_DUE", "SUSPENDED", "CLOSED", "DELETED"]
+    },
+    "avatar_ref": {"type": ["string", "null"], "maxLength": 512},
+    "locale": {"type": "string", "pattern": "^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$"},
+    "timezone": {"type": "string", "maxLength": 80},
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": ["string", "null"], "format": "date-time"},
+    "terms_version": {"type": ["string", "null"], "maxLength": 64},
+    "privacy_version": {"type": ["string", "null"], "maxLength": 64},
+    "age_assurance": {
+      "enum": ["UNKNOWN", "ADULT_SELF_ATTESTED", "ADULT_VERIFIED", "MINOR_RESTRICTED"]
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile_visibility", "public_handle_visible", "legal_name_public"],
+      "properties": {
+        "profile_visibility": {"enum": ["PRIVATE", "CONNECTIONS", "PUBLIC"]},
+        "public_handle_visible": {"type": "boolean"},
+        "legal_name_public": {"const": false},
+        "activity_public": {"type": "boolean", "default": false},
+        "model_training_opt_in": {"type": "boolean", "default": false}
+      }
+    },
+    "identity_links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["provider", "state"],
+        "properties": {
+          "provider": {"enum": ["EMAIL", "PASSKEY", "GOOGLE", "APPLE", "GITHUB", "TELEGRAM", "DISCORD", "PI_NETWORK", "OTHER"]},
+          "state": {"enum": ["PENDING", "VERIFIED", "REVOKED"]},
+          "subject_ref": {"type": ["string", "null"], "maxLength": 256}
+        }
+      }
+    }
+  }
+}

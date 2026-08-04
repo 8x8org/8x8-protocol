@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/schemas/identity/8x8-auth-lifecycle-v1.schema.json",
+  "title": "8x8 Authentication Lifecycle V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "profile_id", "credential", "session", "recovery", "abuse_controls", "redaction", "state"],
+  "properties": {
+    "schema_version": {"const": "8x8.auth-lifecycle.v1"},
+    "profile_id": {"type": "string", "pattern": "^8X8-[A-Z2-9][A-Z2-9-]{7,31}$"},
+    "credential": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["methods", "password_storage", "passkey_private_material_server_stored", "step_up_required_for_sensitive_actions"],
+      "properties": {
+        "methods": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["PASSWORD", "PASSKEY", "FEDERATED"]}},
+        "password_storage": {"enum": ["ARGON2ID", "SCRYPT", "PBKDF2_APPROVED", "NOT_APPLICABLE"]},
+        "passkey_private_material_server_stored": {"const": false},
+        "step_up_required_for_sensitive_actions": {"const": true}
+      }
+    },
+    "session": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["session_id", "issued_at", "expires_at", "nonce", "rotation_counter", "revocation_supported", "replay_cache_required"],
+      "properties": {
+        "session_id": {"type": "string", "pattern": "^ses_[A-Za-z0-9_-]{16,96}$"},
+        "issued_at": {"type": "string", "format": "date-time"},
+        "expires_at": {"type": "string", "format": "date-time"},
+        "nonce": {"type": "string", "pattern": "^[A-Za-z0-9_-]{22,128}$"},
+        "rotation_counter": {"type": "integer", "minimum": 0},
+        "revocation_supported": {"const": true},
+        "replay_cache_required": {"const": true}
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["token_hash_only", "single_use", "expires_in_seconds", "invalidates_existing_sessions", "audit_receipt_required"],
+      "properties": {
+        "token_hash_only": {"const": true},
+        "single_use": {"const": true},
+        "expires_in_seconds": {"type": "integer", "minimum": 300, "maximum": 3600},
+        "invalidates_existing_sessions": {"const": true},
+        "audit_receipt_required": {"const": true}
+      }
+    },
+    "abuse_controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rate_limit_keyed", "multi_account_detection", "device_signal_minimized", "trial_reissue_default"],
+      "properties": {
+        "rate_limit_keyed": {"const": true},
+        "multi_account_detection": {"const": true},
+        "device_signal_minimized": {"const": true},
+        "trial_reissue_default": {"const": "DENY"}
+      }
+    },
+    "redaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passwords", "recovery_tokens", "session_tokens", "passkey_assertions", "private_identity_subjects"],
+      "properties": {
+        "passwords": {"const": "NEVER_LOG"},
+        "recovery_tokens": {"const": "HASH_ONLY"},
+        "session_tokens": {"const": "NEVER_LOG"},
+        "passkey_assertions": {"const": "METADATA_ONLY"},
+        "private_identity_subjects": {"const": "PSEUDONYMIZE"}
+      }
+    },
+    "state": {"enum": ["DESIGN_ONLY", "TEST_MODE", "PRIVATE_BETA", "PUBLIC_BETA", "PRODUCTION_APPROVED", "REVOKED"]}
+  }
+}

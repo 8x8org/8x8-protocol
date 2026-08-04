@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/schemas/connector-manifest-v1.schema.json",
+  "title": "8x8 Connector Manifest V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "connector_id",
+    "display_name",
+    "surfaces",
+    "transport",
+    "scopes",
+    "billing",
+    "wallet_permissions",
+    "receipt_policy",
+    "status"
+  ],
+  "properties": {
+    "schema_version": { "const": "8x8.connector-manifest.v1" },
+    "connector_id": {
+      "type": "string",
+      "pattern": "^con_[A-Za-z0-9_-]{8,96}$"
+    },
+    "display_name": { "type": "string", "minLength": 2, "maxLength": 100 },
+    "surfaces": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "CLI",
+          "MCP",
+          "CHATGPT_APP",
+          "WEB_APP",
+          "MOBILE_APP",
+          "API",
+          "SDK",
+          "WEBHOOK"
+        ]
+      }
+    },
+    "transport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "endpoint_class", "tls_required", "local_only_supported"],
+      "properties": {
+        "protocol": { "enum": ["HTTPS", "STDIO", "SSE", "WEBSOCKET", "LOCAL_SOCKET"] },
+        "endpoint_class": { "enum": ["PUBLIC", "PRIVATE", "LOOPBACK", "OWNER_RELAY"] },
+        "tls_required": { "type": "boolean" },
+        "local_only_supported": { "type": "boolean" }
+      }
+    },
+    "scopes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "profile:read",
+          "entitlement:read",
+          "usage:read",
+          "usage:write",
+          "tasks:submit",
+          "tasks:read",
+          "artifacts:create",
+          "artifacts:read",
+          "worlds:read",
+          "maps:read",
+          "simulations:submit",
+          "receipts:read",
+          "payments:create_intent",
+          "payments:read_status"
+        ]
+      }
+    },
+    "billing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trial_seconds", "paid_price_usd", "billing_period", "server_metered"],
+      "properties": {
+        "trial_seconds": { "const": 5280 },
+        "paid_price_usd": { "const": "8.88" },
+        "billing_period": {
+          "type": ["string", "null"],
+          "enum": [null, "ONE_TIME", "MONTHLY", "QUARTERLY", "YEARLY", "USAGE_PACK"]
+        },
+        "server_metered": { "const": true }
+      }
+    },
+    "wallet_permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["read_addresses", "read_balances", "create_payment_intent", "sign", "spend", "bridge", "swap"],
+      "properties": {
+        "read_addresses": { "const": false },
+        "read_balances": { "const": false },
+        "create_payment_intent": { "type": "boolean" },
+        "sign": { "const": false },
+        "spend": { "const": false },
+        "bridge": { "const": false },
+        "swap": { "const": false }
+      }
+    },
+    "receipt_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "hash_algorithm", "false_complete_forbidden"],
+      "properties": {
+        "required": { "const": true },
+        "hash_algorithm": { "const": "SHA-256" },
+        "false_complete_forbidden": { "const": true }
+      }
+    },
+    "status": {
+      "enum": ["DESIGN_ONLY", "LOCAL_CANARY", "PRIVATE_BETA", "PUBLIC_BETA", "PRODUCTION_BLOCKED", "PRODUCTION_APPROVED"]
+    }
+  }
+}

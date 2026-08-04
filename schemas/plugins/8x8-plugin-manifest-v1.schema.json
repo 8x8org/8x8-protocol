@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/schemas/plugins/8x8-plugin-manifest-v1.schema.json",
+  "title": "8x8 Plugin Manifest V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "plugin_id",
+    "name",
+    "version",
+    "8x8_label",
+    "runtime",
+    "capabilities",
+    "permissions",
+    "resources",
+    "provenance",
+    "tests",
+    "rollback"
+  ],
+  "properties": {
+    "schema_version": {"const": "8x8.plugin-manifest.v1"},
+    "plugin_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"},
+    "name": {"type": "string", "minLength": 1, "maxLength": 160},
+    "version": {"type": "string", "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"},
+    "8x8_label": {"const": "8x8-compatible"},
+    "description": {"type": "string", "maxLength": 2000},
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["class", "entrypoint"],
+      "properties": {
+        "class": {"enum": ["WASI_COMPONENT", "OCI_CONTAINER", "WEB_COMPONENT", "MCP_SERVER", "CLI", "NATIVE_ADAPTER"]},
+        "entrypoint": {"type": "string", "minLength": 1},
+        "interface_version": {"type": "string", "minLength": 1},
+        "artifact_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["imports", "exports"],
+      "properties": {
+        "imports": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "exports": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default", "filesystem", "network", "secrets", "messages", "financial", "service_control"],
+      "properties": {
+        "default": {"const": "DENY"},
+        "filesystem": {"type": "array", "items": {"type": "string"}},
+        "network": {"type": "array", "items": {"type": "string"}},
+        "secrets": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,127}$"}},
+        "messages": {"enum": ["NONE", "DRAFT_ONLY", "OWNER_GATED", "BOUNDED"]},
+        "financial": {"const": "NONE"},
+        "service_control": {"enum": ["NONE", "OWNER_GATED"]}
+      }
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cpu_millis", "memory_mib", "storage_mib", "timeout_seconds"],
+      "properties": {
+        "cpu_millis": {"type": "integer", "minimum": 1},
+        "memory_mib": {"type": "integer", "minimum": 1},
+        "storage_mib": {"type": "integer", "minimum": 0},
+        "timeout_seconds": {"type": "integer", "minimum": 1},
+        "network_requests_per_minute": {"type": "integer", "minimum": 0}
+      }
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input_classes", "output_classes", "retention"],
+      "properties": {
+        "input_classes": {"type": "array", "uniqueItems": true, "items": {"enum": ["PUBLIC", "INTERNAL", "PRIVATE", "SECRET"]}},
+        "output_classes": {"type": "array", "uniqueItems": true, "items": {"enum": ["PUBLIC", "INTERNAL", "PRIVATE"]}},
+        "retention": {"enum": ["NONE", "EPHEMERAL", "BOUNDED", "USER_CONTROLLED"]}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_repository", "source_commit", "license", "sbom", "signature"],
+      "properties": {
+        "source_repository": {"type": "string", "format": "uri"},
+        "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "license": {"type": "string", "minLength": 1},
+        "sbom": {"type": "string", "minLength": 1},
+        "signature": {"type": "string", "minLength": 1},
+        "upstream_project": {"type": ["string", "null"]},
+        "upstream_license": {"type": ["string", "null"]},
+        "modification_notice": {"type": ["string", "null"]}
+      }
+    },
+    "tests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract", "security", "resource", "rollback", "conformance_score"],
+      "properties": {
+        "contract": {"type": "boolean"},
+        "security": {"type": "boolean"},
+        "resource": {"type": "boolean"},
+        "rollback": {"type": "boolean"},
+        "conformance_score": {"type": "integer", "minimum": 0, "maximum": 100}
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "tested"],
+      "properties": {
+        "strategy": {"type": "string", "minLength": 1},
+        "tested": {"type": "boolean"}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"tests": {"properties": {"conformance_score": {"const": 100}}}}},
+      "then": {
+        "properties": {
+          "tests": {
+            "properties": {
+              "contract": {"const": true},
+              "security": {"const": true},
+              "resource": {"const": true},
+              "rollback": {"const": true}
+            }
+          },
+          "rollback": {"properties": {"tested": {"const": true}}}
+        }
+      }
+    }
+  ]
+}

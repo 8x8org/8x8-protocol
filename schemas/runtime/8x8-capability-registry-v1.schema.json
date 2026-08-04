@@ -5,6 +5,18 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "generated_at", "models", "agents", "truth_policy"],
+  "$defs": {
+    "evidence_ref": {
+      "type": "string",
+      "maxLength": 512,
+      "pattern": "^(receipt|source|commit|sha256|artifact|registry):[A-Za-z0-9][A-Za-z0-9._:/@+-]{2,509}$"
+    },
+    "receipt_ref": {
+      "type": "string",
+      "maxLength": 512,
+      "pattern": "^receipt:[A-Za-z0-9][A-Za-z0-9._:/@+-]{2,503}$"
+    }
+  },
   "properties": {
     "schema_version": {"const": "8x8.capability-registry.v1"},
     "generated_at": {"type": "string", "format": "date-time"},
@@ -34,9 +46,24 @@
           "status": {"enum": ["VERIFIED_RUNNING", "VERIFIED_INSTALLED", "OWNER_CONFIRMED", "SOURCE_PRESENT", "STALE", "UNREACHABLE", "NOT_FOUND_IN_SCANNED_SCOPE", "BLOCKED"]},
           "evidence": {
             "type": "array",
-            "items": {"type": "string", "maxLength": 512}
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"$ref": "#/$defs/evidence_ref"}
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"status": {"const": "VERIFIED_RUNNING"}}, "required": ["status"]},
+            "then": {
+              "properties": {
+                "evidence": {
+                  "contains": {"$ref": "#/$defs/receipt_ref"},
+                  "minContains": 1
+                }
+              }
+            }
+          }
+        ]
       }
     },
     "agents": {
@@ -66,9 +93,32 @@
           "productive_receipt_ref": {"type": ["string", "null"], "maxLength": 512},
           "evidence": {
             "type": "array",
-            "items": {"type": "string", "maxLength": 512}
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"$ref": "#/$defs/evidence_ref"}
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"status": {"const": "VERIFIED_ACTIVE"}}, "required": ["status"]},
+            "then": {
+              "required": ["productive_receipt_ref"],
+              "properties": {
+                "productive_receipt_ref": {"$ref": "#/$defs/receipt_ref"},
+                "evidence": {
+                  "contains": {"$ref": "#/$defs/receipt_ref"},
+                  "minContains": 1
+                }
+              }
+            }
+          },
+          {
+            "if": {"properties": {"status": {"const": "PERSONA_ONLY"}}, "required": ["status"]},
+            "then": {
+              "properties": {"productive_receipt_ref": {"type": "null"}}
+            }
+          }
+        ]
       }
     },
     "truth_policy": {

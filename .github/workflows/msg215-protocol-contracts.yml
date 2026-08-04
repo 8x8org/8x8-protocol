@@ -29,12 +29,11 @@ jobs:
       - name: Validate JSON syntax
         run: |
           python -m json.tool tests/fixtures/msg215_protocol_cases.json >/dev/null
-          for schema in \
-            schemas/identity/8x8-user-profile-v1.schema.json \
-            schemas/commerce/8x8-subscription-plan-v1.schema.json \
-            schemas/connectors/8x8-discord-connector-v1.schema.json \
-            schemas/runtime/8x8-capability-registry-v1.schema.json; do
-            python -m json.tool "$schema" >/dev/null
-          done
-      - name: Run protocol invariants
+          python -m json.tool tests/fixtures/msg215_network_adapter_cases.json >/dev/null
+          find schemas -type f -name '*.schema.json' -print0 \
+            | sort -z \
+            | xargs -0 -n1 python -m json.tool >/dev/null
+      - name: Run identity, entitlement, registry and trust invariants
         run: python tests/test_msg215_protocol_contracts.py
+      - name: Run multichain network-adapter invariants
+        run: python tests/test_msg215_network_adapters.py

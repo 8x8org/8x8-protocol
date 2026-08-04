@@ -1,0 +1,40 @@
+name: MSG215 Protocol Contracts
+
+on:
+  pull_request:
+    paths:
+      - "schemas/**"
+      - "tests/**"
+      - ".github/workflows/msg215-protocol-contracts.yml"
+  push:
+    branches:
+      - "feature/msg213-commercial-protocol-v1"
+    paths:
+      - "schemas/**"
+      - "tests/**"
+      - ".github/workflows/msg215-protocol-contracts.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  protocol-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate JSON syntax
+        run: |
+          python -m json.tool tests/fixtures/msg215_protocol_cases.json >/dev/null
+          for schema in \
+            schemas/identity/8x8-user-profile-v1.schema.json \
+            schemas/commerce/8x8-subscription-plan-v1.schema.json \
+            schemas/connectors/8x8-discord-connector-v1.schema.json \
+            schemas/runtime/8x8-capability-registry-v1.schema.json; do
+            python -m json.tool "$schema" >/dev/null
+          done
+      - name: Run protocol invariants
+        run: python tests/test_msg215_protocol_contracts.py

@@ -9,7 +9,7 @@
     "evidence_ref": {
       "type": "string",
       "maxLength": 512,
-      "pattern": "^(receipt|source|commit|sha256|artifact|registry):[A-Za-z0-9][A-Za-z0-9._:/@+-]{2,509}$"
+      "pattern": "^(?:commit:[0-9a-f]{40}|sha256:[0-9a-f]{64}|(?:receipt|source|artifact|registry):[A-Za-z0-9][A-Za-z0-9._:/@+-]{2,509})$"
     },
     "receipt_ref": {
       "type": "string",

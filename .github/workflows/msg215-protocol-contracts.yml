@@ -28,12 +28,15 @@ jobs:
           python-version: "3.12"
       - name: Validate JSON syntax
         run: |
-          python -m json.tool tests/fixtures/msg215_protocol_cases.json >/dev/null
-          python -m json.tool tests/fixtures/msg215_network_adapter_cases.json >/dev/null
+          find tests/fixtures -type f -name 'msg215_*.json' -print0 \
+            | sort -z \
+            | xargs -0 -n1 python -m json.tool >/dev/null
           find schemas -type f -name '*.schema.json' -print0 \
             | sort -z \
             | xargs -0 -n1 python -m json.tool >/dev/null
       - name: Run identity, entitlement, registry and trust invariants
         run: python tests/test_msg215_protocol_contracts.py
+      - name: Run authentication lifecycle invariants
+        run: python tests/test_msg215_auth_lifecycle.py
       - name: Run multichain network-adapter invariants
         run: python tests/test_msg215_network_adapters.py

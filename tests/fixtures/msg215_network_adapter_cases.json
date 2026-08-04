@@ -1,0 +1,161 @@
+{
+  "positive": [
+    {
+      "adapter_id": "adapter:bitcoin:mainnet-design",
+      "network": "BITCOIN",
+      "namespace": "BIP122",
+      "reference": "000000000019d6689c085ae165831e93",
+      "environment": "MAINNET_DESIGN_ONLY",
+      "mode": "WATCH_ONLY",
+      "confirmation_basis": "BLOCK_CONFIRMATIONS",
+      "minimum_confirmations": 3,
+      "reorg_handling": "RECHECK_UNTIL_FINAL",
+      "secret_material_present": false,
+      "spend_authority_present": false,
+      "live_actions_enabled": false,
+      "automatic_swap_enabled": false,
+      "automatic_bridge_enabled": false,
+      "evidence": ["standard:bip122", "owner-confirmation:wallet-exists-not-inspected"]
+    },
+    {
+      "adapter_id": "adapter:monero:mainnet-design",
+      "network": "MONERO",
+      "namespace": "MONERO_NETWORK",
+      "reference": "mainnet",
+      "environment": "MAINNET_DESIGN_ONLY",
+      "mode": "VIEW_ONLY",
+      "confirmation_basis": "BLOCK_CONFIRMATIONS",
+      "minimum_confirmations": 10,
+      "reorg_handling": "RECHECK_UNTIL_FINAL",
+      "secret_material_present": false,
+      "spend_authority_present": false,
+      "live_actions_enabled": false,
+      "automatic_swap_enabled": false,
+      "automatic_bridge_enabled": false,
+      "evidence": ["standard:monero-network", "owner-confirmation:wallet-exists-not-inspected"]
+    },
+    {
+      "adapter_id": "adapter:ethereum:sepolia",
+      "network": "ETHEREUM",
+      "namespace": "CAIP2",
+      "reference": "eip155:11155111",
+      "environment": "TESTNET",
+      "mode": "READ_ONLY_RPC",
+      "confirmation_basis": "FINALIZED_CHECKPOINT",
+      "minimum_confirmations": 0,
+      "reorg_handling": "RECHECK_UNTIL_FINAL",
+      "secret_material_present": false,
+      "spend_authority_present": false,
+      "live_actions_enabled": false,
+      "automatic_swap_enabled": false,
+      "automatic_bridge_enabled": false,
+      "evidence": ["standard:caip2"]
+    },
+    {
+      "adapter_id": "adapter:bsc:testnet",
+      "network": "BNB_SMART_CHAIN",
+      "namespace": "CAIP2",
+      "reference": "eip155:97",
+      "environment": "TESTNET",
+      "mode": "READ_ONLY_RPC",
+      "confirmation_basis": "BLOCK_CONFIRMATIONS",
+      "minimum_confirmations": 15,
+      "reorg_handling": "RECHECK_UNTIL_FINAL",
+      "secret_material_present": false,
+      "spend_authority_present": false,
+      "live_actions_enabled": false,
+      "automatic_swap_enabled": false,
+      "automatic_bridge_enabled": false,
+      "evidence": ["standard:caip2"]
+    },
+    {
+      "adapter_id": "adapter:solana:devnet",
+      "network": "SOLANA",
+      "namespace": "CAIP2",
+      "reference": "solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1",
+      "environment": "DEVNET",
+      "mode": "READ_ONLY_RPC",
+      "confirmation_basis": "FINALIZED_CHECKPOINT",
+      "minimum_confirmations": 0,
+      "reorg_handling": "RECHECK_UNTIL_FINAL",
+      "secret_material_present": false,
+      "spend_authority_present": false,
+      "live_actions_enabled": false,
+      "automatic_swap_enabled": false,
+      "automatic_bridge_enabled": false,
+      "evidence": ["standard:caip2"]
+    },
+    {
+      "adapter_id": "adapter:ton:testnet",
+      "network": "TON",
+      "namespace": "TON_NETWORK",
+      "reference": "testnet",
+      "environment": "TESTNET",
+      "mode": "READ_ONLY_RPC",
+      "confirmation_basis": "NETWORK_ACCEPTED",
+      "minimum_confirmations": 1,
+      "reorg_handling": "RECHECK_UNTIL_FINAL",
+      "secret_material_present": false,
+      "spend_authority_present": false,
+      "live_actions_enabled": false,
+      "automatic_swap_enabled": false,
+      "automatic_bridge_enabled": false,
+      "evidence": ["standard:ton-network"]
+    },
+    {
+      "adapter_id": "adapter:pi:sandbox",
+      "network": "PI_NETWORK",
+      "namespace": "PI_NETWORK",
+      "reference": "sandbox",
+      "environment": "SANDBOX",
+      "mode": "SIMULATED",
+      "confirmation_basis": "SIMULATED",
+      "minimum_confirmations": 0,
+      "reorg_handling": "NOT_APPLICABLE",
+      "secret_material_present": false,
+      "spend_authority_present": false,
+      "live_actions_enabled": false,
+      "automatic_swap_enabled": false,
+      "automatic_bridge_enabled": false,
+      "evidence": ["source:pi-sandbox-design"]
+    }
+  ],
+  "negative": [
+    {
+      "case": "bitcoin_wrong_namespace",
+      "network": "BITCOIN",
+      "namespace": "CAIP2",
+      "mode": "WATCH_ONLY"
+    },
+    {
+      "case": "monero_wrong_mode",
+      "network": "MONERO",
+      "namespace": "MONERO_NETWORK",
+      "mode": "READ_ONLY_RPC"
+    },
+    {
+      "case": "secret_material_present",
+      "secret_material_present": true
+    },
+    {
+      "case": "spend_authority_present",
+      "spend_authority_present": true
+    },
+    {
+      "case": "live_actions_enabled",
+      "live_actions_enabled": true
+    },
+    {
+      "case": "automatic_swap_enabled",
+      "automatic_swap_enabled": true
+    },
+    {
+      "case": "automatic_bridge_enabled",
+      "automatic_bridge_enabled": true
+    },
+    {
+      "case": "duplicate_adapter_ids",
+      "adapter_ids": ["adapter:x", "adapter:x"]
+    }
+  ]
+}

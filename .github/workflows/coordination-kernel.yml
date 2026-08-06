@@ -1,0 +1,39 @@
+name: Validate Coordination Kernel 0.0.1
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - feature/coordination-kernel-0-0-1
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile reference implementation
+        run: python -m py_compile coordination_kernel/coordination_kernel.py
+      - name: Run deterministic tests
+        run: python -m unittest discover -s tests -v
+      - name: Verify public policy JSON
+        run: python -m json.tool coordination_kernel/policy/public-projection-policy-0.0.1.json >/dev/null
+      - name: Reject private material and maturity drift
+        run: |
+          if grep -RInE '(BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|seed phrase|api_key=|authorization: bearer|/root/|sk-[A-Za-z0-9])' coordination_kernel tests; then
+            echo "Private or credential-like material detected"
+            exit 1
+          fi
+          if grep -RInE '(product_version["'"']?[[:space:]]*[:=][[:space:]]*["'"']?(1\.0|0\.1))' coordination_kernel tests; then
+            echo "Product maturity drift detected"
+            exit 1
+          fi

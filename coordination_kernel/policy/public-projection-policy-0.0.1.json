@@ -1,0 +1,28 @@
+{
+  "product_version": "0.0.1",
+  "allowed_top_level": [
+    "product_version",
+    "reality",
+    "promotion_state",
+    "public_products",
+    "public_repositories",
+    "release_units",
+    "evidence_summary",
+    "updated_at"
+  ],
+  "blocked_terms": [
+    "BEGIN PRIVATE KEY",
+    "seed phrase",
+    "api_key",
+    "authorization: bearer",
+    "/root/",
+    "private_message",
+    "wallet_secret",
+    "signing_key",
+    "127.0.0.1",
+    "localhost:"
+  ],
+  "fail_closed": true,
+  "reality": "PUBLIC_PRESENT",
+  "promotion_state": "PROTECTED_BETA"
+}

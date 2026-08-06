@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/schemas/8x8-coordination-objects-0.0.1.schema.json",
+  "title": "8x8 Coordination Objects 0.0.1",
+  "type": "object",
+  "required": ["product_version", "object_type", "object"],
+  "properties": {
+    "product_version": {"const": "0.0.1"},
+    "object_type": {
+      "enum": [
+        "AGENT_PASSPORT",
+        "PROMOTION_RECEIPT",
+        "ROLLBACK_RECORD",
+        "PUBLIC_CLAIM",
+        "CAPABILITY_MANIFEST",
+        "POLICY_DECISION",
+        "CONTRADICTION",
+        "FRESHNESS_POLICY",
+        "CONTEXT_SNAPSHOT",
+        "EVENT"
+      ]
+    },
+    "object": {"type": "object"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"object_type": {"const": "AGENT_PASSPORT"}}},
+      "then": {"properties": {"object": {"required": ["agent_id", "body_id", "owner", "role", "capabilities", "denied_powers", "authority_ceiling", "memory_scope", "model_routes", "health", "latest_receipt", "reality"]}}}
+    },
+    {
+      "if": {"properties": {"object_type": {"const": "PROMOTION_RECEIPT"}}},
+      "then": {"properties": {"object": {"required": ["artifact_digest", "source_reality", "target_reality", "privacy_review", "security_review", "license_review", "tests", "accessibility", "rollback_target", "owner_approval", "approved_claims"]}}}
+    },
+    {
+      "if": {"properties": {"object_type": {"const": "ROLLBACK_RECORD"}}},
+      "then": {"properties": {"object": {"required": ["rollback_id", "target", "known_good_digest", "procedure", "preconditions", "verification", "last_tested_at"]}}}
+    },
+    {
+      "if": {"properties": {"object_type": {"const": "PUBLIC_CLAIM"}}},
+      "then": {"properties": {"object": {"required": ["claim_id", "text", "source_digest", "evidence_state", "fresh_until", "release_unit", "privacy_safe", "revocation_status"]}}}
+    },
+    {
+      "if": {"properties": {"object_type": {"const": "CAPABILITY_MANIFEST"}}},
+      "then": {"properties": {"object": {"required": ["capability_id", "owner", "version", "permissions", "denied_permissions", "data_classes", "resource_limits", "network_policy", "threat_model", "provenance", "tests", "cleanup", "rollback", "supported_realities"]}}}
+    },
+    {
+      "if": {"properties": {"object_type": {"const": "POLICY_DECISION"}}},
+      "then": {"properties": {"object": {"required": ["decision_id", "subject", "action", "result", "reasons", "policy_digest", "context_digest", "evaluated_at", "expires_at"]}}}
+    }
+  ]
+}

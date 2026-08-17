@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/schemas/8x8-runtime-integration-0.0.1.schema.json",
+  "title": "8x8 Runtime Integration 0.0.1",
+  "type": "object",
+  "required": [
+    "product_version",
+    "integration_id",
+    "node_id",
+    "state",
+    "context_snapshot",
+    "lease_registry",
+    "event_feed",
+    "transport",
+    "activation",
+    "rollback",
+    "reality"
+  ],
+  "properties": {
+    "product_version": { "const": "0.0.1" },
+    "integration_id": { "type": "string", "minLength": 1 },
+    "node_id": { "type": "string", "minLength": 1 },
+    "state": {
+      "enum": [
+        "DESIGNED",
+        "IMPLEMENTED_REFERENCE_NOT_LIVE",
+        "INSTALLED_NOT_ACTIVATED",
+        "CANARY_RUNNING",
+        "RUNNING",
+        "DEGRADED",
+        "BLOCKED",
+        "ROLLED_BACK",
+        "REVOKED"
+      ]
+    },
+    "context_snapshot": {
+      "type": "object",
+      "required": ["path", "digest", "issued_at", "expires_at", "signature_scheme"],
+      "properties": {
+        "path": { "type": "string" },
+        "digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "issued_at": { "type": "string", "format": "date-time" },
+        "expires_at": { "type": "string", "format": "date-time" },
+        "signature_scheme": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "lease_registry": {
+      "type": "object",
+      "required": ["path", "active_count", "conflict_count", "enforced"],
+      "properties": {
+        "path": { "type": "string" },
+        "active_count": { "type": "integer", "minimum": 0 },
+        "conflict_count": { "type": "integer", "minimum": 0 },
+        "enforced": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "event_feed": {
+      "type": "object",
+      "required": ["path", "append_only", "hash_linked"],
+      "properties": {
+        "path": { "type": "string" },
+        "append_only": { "type": "boolean" },
+        "hash_linked": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "transport": {
+      "type": "object",
+      "required": ["bind", "port", "read_only", "authenticated"],
+      "properties": {
+        "bind": { "type": "string" },
+        "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+        "read_only": { "const": true },
+        "authenticated": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "activation": {
+      "type": "object",
+      "required": ["lease_id", "canary_passed", "secret_scan_passed", "method_restriction_passed", "receipt"],
+      "properties": {
+        "lease_id": { "type": ["string", "null"] },
+        "canary_passed": { "type": "boolean" },
+        "secret_scan_passed": { "type": "boolean" },
+        "method_restriction_passed": { "type": "boolean" },
+        "receipt": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "rollback": {
+      "type": "object",
+      "required": ["available", "tested", "target", "receipt"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "tested": { "type": "boolean" },
+        "target": { "type": ["string", "null"] },
+        "receipt": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "reality": { "enum": ["PRIVATE_PAST", "PUBLIC_PRESENT", "FUTURE_LAB"] },
+    "promotion_state": { "type": ["string", "null"], "enum": ["PROTECTED_BETA", null] }
+  },
+  "additionalProperties": false
+}

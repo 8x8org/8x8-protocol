@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/protocol/schemas/treasury-settlement.v0.1.json",
+  "title": "8x8 Treasury Settlement v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "settlement_id",
+    "allocation_ids",
+    "resource_receipt_ids",
+    "accounting_asset",
+    "atomic_unit",
+    "gross_proceeds",
+    "deductions",
+    "ecosystem_fee_bps",
+    "ecosystem_fee_amount",
+    "user_reward_pool",
+    "treasury_reserve",
+    "pending_dispute_reserve",
+    "rounding_remainder",
+    "reconciles",
+    "stage",
+    "created_at",
+    "settlement_digest"
+  ],
+  "properties": {
+    "schema": {"const": "8x8.treasury-settlement.v0.1"},
+    "settlement_id": {
+      "type": "string",
+      "pattern": "^SETTLEMENT[.][A-Za-z0-9._:-]{8,160}$"
+    },
+    "allocation_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^ALLOCATION[.][A-Za-z0-9._:-]{8,160}$"}
+    },
+    "resource_receipt_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^RECEIPT[.][A-Za-z0-9._:-]{8,160}$"}
+    },
+    "accounting_asset": {"type": "string", "minLength": 1, "maxLength": 100},
+    "atomic_unit": {"type": "string", "minLength": 1, "maxLength": 100},
+    "gross_proceeds": {"type": "integer", "minimum": 0},
+    "deductions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pool_fee",
+        "network_fee",
+        "provider_or_conversion_fee",
+        "custody_cost",
+        "tax_or_legal_deduction",
+        "direct_operating_cost"
+      ],
+      "properties": {
+        "pool_fee": {"type": "integer", "minimum": 0},
+        "network_fee": {"type": "integer", "minimum": 0},
+        "provider_or_conversion_fee": {"type": "integer", "minimum": 0},
+        "custody_cost": {"type": "integer", "minimum": 0},
+        "tax_or_legal_deduction": {"type": "integer", "minimum": 0},
+        "direct_operating_cost": {"type": "integer", "minimum": 0}
+      }
+    },
+    "ecosystem_fee_bps": {"type": "integer", "minimum": 0, "maximum": 10000},
+    "ecosystem_fee_amount": {"type": "integer", "minimum": 0},
+    "user_reward_pool": {"type": "integer", "minimum": 0},
+    "treasury_reserve": {"type": "integer", "minimum": 0},
+    "pending_dispute_reserve": {"type": "integer", "minimum": 0},
+    "rounding_remainder": {"type": "integer", "minimum": 0},
+    "reconciles": {"const": true},
+    "stage": {
+      "enum": ["SIMULATED", "MEASURED_UNPRICED", "OFFCHAIN_PENDING", "OFFCHAIN_FINAL", "ONCHAIN_SETTLED"]
+    },
+    "transaction_reference": {"type": ["string", "null"], "maxLength": 300},
+    "created_at": {"type": "string", "format": "date-time"},
+    "finalized_at": {"type": ["string", "null"], "format": "date-time"},
+    "settlement_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"stage": {"const": "ONCHAIN_SETTLED"}}},
+      "then": {
+        "required": ["transaction_reference", "finalized_at"],
+        "properties": {
+          "transaction_reference": {"type": "string", "minLength": 8},
+          "finalized_at": {"type": "string", "format": "date-time"}
+        }
+      }
+    }
+  ]
+}

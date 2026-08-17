@@ -1,0 +1,19 @@
+{
+  "schema": "8x8.reward-event.v0.1",
+  "reward_event_id": "REWARD.example.cpu.20260801",
+  "node_id": "NODE.example.public",
+  "resource_receipt_ids": ["RECEIPT.example.cpu.20260801"],
+  "stage": "SIMULATED",
+  "unit": "TEST_CREDIT",
+  "quantity": 0,
+  "created_at": "2026-08-01T22:59:01Z",
+  "finalized_at": null,
+  "jurisdiction": "TEST_ONLY",
+  "compliance_gate": "NOT_REQUIRED_FOR_SIMULATION",
+  "asset_reference": null,
+  "transaction_reference": null,
+  "guaranteed_value": false,
+  "investment_claim": false,
+  "dispute_status": "NONE",
+  "event_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+}

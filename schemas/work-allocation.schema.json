@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/protocol/schemas/work-allocation.v0.1.json",
+  "title": "8x8 Work Allocation v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "allocation_id",
+    "node_id",
+    "capability_attestation_id",
+    "consent_id",
+    "profile_id",
+    "workload_type",
+    "workload_id",
+    "algorithm_or_protocol",
+    "network_or_domain",
+    "coordinator_id",
+    "code_digest",
+    "resource_ceiling",
+    "starts_at",
+    "expires_at",
+    "treasury_destination_ref",
+    "reward_accounting_stage",
+    "profitability_guaranteed",
+    "user_disclosure_receipt",
+    "allocation_digest"
+  ],
+  "properties": {
+    "schema": {"const": "8x8.work-allocation.v0.1"},
+    "allocation_id": {
+      "type": "string",
+      "pattern": "^ALLOCATION[.][A-Za-z0-9._:-]{8,160}$"
+    },
+    "node_id": {
+      "type": "string",
+      "pattern": "^NODE[.][A-Za-z0-9._:-]{4,160}$"
+    },
+    "capability_attestation_id": {
+      "type": "string",
+      "pattern": "^CAPABILITY[.][A-Za-z0-9._:-]{8,160}$"
+    },
+    "consent_id": {
+      "type": "string",
+      "pattern": "^CONSENT[.][A-Za-z0-9._:-]{8,160}$"
+    },
+    "profile_id": {"enum": ["STANDARD_25", "ENHANCED_75", "CUSTOM"]},
+    "workload_type": {
+      "enum": [
+        "POW_MINING",
+        "POS_VALIDATION",
+        "AI_INFERENCE",
+        "MEDIA_PROCESSING",
+        "SOFTWARE_TESTING",
+        "INDEXING",
+        "RESEARCH_COMPUTE",
+        "STORAGE_VERIFICATION",
+        "REMOTE_MINER_CONTROL"
+      ]
+    },
+    "workload_id": {"type": "string", "minLength": 1, "maxLength": 200},
+    "algorithm_or_protocol": {"type": "string", "minLength": 1, "maxLength": 200},
+    "network_or_domain": {"type": "string", "minLength": 1, "maxLength": 200},
+    "coordinator_id": {"type": "string", "minLength": 1, "maxLength": 300},
+    "pool_or_provider_id": {"type": ["string", "null"], "maxLength": 300},
+    "code_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "resource_ceiling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cpu_percent", "gpu_percent", "available_memory_percent", "duration_seconds"],
+      "properties": {
+        "cpu_percent": {"type": "number", "minimum": 0, "maximum": 75},
+        "gpu_percent": {"type": "number", "minimum": 0, "maximum": 75},
+        "available_memory_percent": {"type": "number", "minimum": 0, "maximum": 75},
+        "storage_bytes": {"type": "integer", "minimum": 0, "default": 0},
+        "upload_bytes": {"type": "integer", "minimum": 0, "default": 0},
+        "download_bytes": {"type": "integer", "minimum": 0, "default": 0},
+        "duration_seconds": {"type": "integer", "minimum": 1, "maximum": 86400}
+      }
+    },
+    "starts_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "treasury_destination_ref": {
+      "type": ["string", "null"],
+      "pattern": "^TREASURYREF[.][A-Za-z0-9._:-]{4,200}$"
+    },
+    "reward_accounting_stage": {
+      "enum": ["NONE", "SIMULATED", "MEASURED_UNPRICED", "OFFCHAIN_PENDING"]
+    },
+    "profitability_guaranteed": {"const": false},
+    "user_disclosure_receipt": {"type": "string", "minLength": 1, "maxLength": 1000},
+    "allocation_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"profile_id": {"const": "STANDARD_25"}}},
+      "then": {
+        "properties": {
+          "resource_ceiling": {
+            "properties": {
+              "cpu_percent": {"maximum": 25},
+              "gpu_percent": {"maximum": 25},
+              "available_memory_percent": {"maximum": 25}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"workload_type": {"enum": ["POW_MINING", "POS_VALIDATION"]}}},
+      "then": {"properties": {"treasury_destination_ref": {"type": "string"}}}
+    }
+  ]
+}

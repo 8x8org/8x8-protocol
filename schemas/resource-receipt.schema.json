@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/protocol/schemas/resource-receipt.v0.1.json",
+  "title": "8x8 Node Resource Receipt v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "receipt_id",
+    "node_id",
+    "consent_id",
+    "workload_id",
+    "coordinator_id",
+    "code_digest",
+    "policy_digest",
+    "started_at",
+    "ended_at",
+    "resource_class",
+    "measured_units",
+    "declared_limits",
+    "result",
+    "reward_stage",
+    "previous_receipt_digest",
+    "receipt_digest"
+  ],
+  "properties": {
+    "schema": {
+      "const": "8x8.resource-receipt.v0.1"
+    },
+    "receipt_id": {
+      "type": "string",
+      "pattern": "^RECEIPT[.][A-Za-z0-9._:-]{8,160}$"
+    },
+    "node_id": {
+      "type": "string",
+      "pattern": "^NODE[.][A-Za-z0-9._:-]{4,160}$"
+    },
+    "consent_id": {
+      "type": "string",
+      "pattern": "^CONSENT[.][A-Za-z0-9._:-]{8,160}$"
+    },
+    "workload_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "coordinator_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "code_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "policy_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ended_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resource_class": {
+      "enum": [
+        "CPU",
+        "GPU",
+        "STORAGE",
+        "BANDWIDTH",
+        "TELEMETRY",
+        "REMOTE_MINER_MANAGEMENT",
+        "PRECISE_LOCATION",
+        "REWARDS"
+      ]
+    },
+    "measured_units": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0
+      },
+      "minProperties": 1,
+      "maxProperties": 20
+    },
+    "declared_limits": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "result": {
+      "enum": ["COMPLETED", "INTERRUPTED", "REJECTED", "FAILED_SAFE"]
+    },
+    "reason_code": {
+      "type": ["string", "null"],
+      "maxLength": 300
+    },
+    "reward_stage": {
+      "enum": [
+        "NONE",
+        "SIMULATED",
+        "MEASURED_UNPRICED",
+        "OFFCHAIN_PENDING",
+        "OFFCHAIN_FINAL",
+        "ONCHAIN_PENDING",
+        "ONCHAIN_SETTLED"
+      ]
+    },
+    "reward_event_id": {
+      "type": ["string", "null"],
+      "maxLength": 200
+    },
+    "transaction_reference": {
+      "type": ["string", "null"],
+      "maxLength": 300
+    },
+    "dispute_deadline": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "previous_receipt_digest": {
+      "type": ["string", "null"],
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "receipt_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "privacy_assertions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "secret_values_excluded",
+        "precise_coordinates_excluded",
+        "private_message_bodies_excluded",
+        "unrelated_personal_paths_excluded"
+      ],
+      "properties": {
+        "secret_values_excluded": {"const": true},
+        "precise_coordinates_excluded": {"const": true},
+        "private_message_bodies_excluded": {"const": true},
+        "unrelated_personal_paths_excluded": {"const": true}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "reward_stage": {"const": "ONCHAIN_SETTLED"}
+        }
+      },
+      "then": {
+        "required": ["transaction_reference"],
+        "properties": {
+          "transaction_reference": {
+            "type": "string",
+            "minLength": 8
+          }
+        }
+      }
+    }
+  ]
+}

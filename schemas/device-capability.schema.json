@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/protocol/schemas/device-capability.v0.1.json",
+  "title": "8x8 Device Capability Attestation v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "attestation_id",
+    "node_id",
+    "platform",
+    "hardware_class",
+    "roles",
+    "cpu_logical_units",
+    "memory_bytes",
+    "gpu_class",
+    "storage_available_bytes",
+    "background_service_supported",
+    "local_crypto_mining_policy",
+    "remote_miner_management_supported",
+    "attested_at",
+    "expires_at",
+    "attestation_digest"
+  ],
+  "properties": {
+    "schema": {"const": "8x8.device-capability.v0.1"},
+    "attestation_id": {
+      "type": "string",
+      "pattern": "^CAPABILITY[.][A-Za-z0-9._:-]{8,160}$"
+    },
+    "node_id": {
+      "type": "string",
+      "pattern": "^NODE[.][A-Za-z0-9._:-]{4,160}$"
+    },
+    "platform": {
+      "enum": [
+        "APPLE_APP_STORE",
+        "GOOGLE_PLAY",
+        "TELEGRAM_MINI_APP",
+        "BROWSER",
+        "NATIVE_DESKTOP",
+        "CLI_REPOSITORY_INSTALL",
+        "REMOTE_ASIC_RIG",
+        "OTHER_NATIVE"
+      ]
+    },
+    "hardware_class": {
+      "enum": [
+        "MOBILE_CONTROLLER",
+        "WEB_CONTROLLER",
+        "GENERAL_CPU",
+        "GENERAL_GPU",
+        "WORKSTATION_GPU",
+        "SERVER_CPU",
+        "STORAGE_APPLIANCE",
+        "ASIC_MINER",
+        "VALIDATOR_HOST",
+        "UNKNOWN"
+      ]
+    },
+    "roles": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "CONTROLLER_ONLY",
+          "FOREGROUND_COMPUTE",
+          "BACKGROUND_COMPUTE",
+          "MINING_ELIGIBLE",
+          "REMOTE_MINER",
+          "STORAGE_NODE",
+          "VALIDATOR_ELIGIBLE"
+        ]
+      }
+    },
+    "cpu_logical_units": {"type": "integer", "minimum": 0},
+    "memory_bytes": {"type": "integer", "minimum": 0},
+    "gpu_class": {
+      "enum": ["NONE", "INTEGRATED", "MOBILE", "DISCRETE", "ACCELERATOR", "UNKNOWN"]
+    },
+    "gpu_memory_bytes": {"type": ["integer", "null"], "minimum": 0},
+    "storage_available_bytes": {"type": "integer", "minimum": 0},
+    "background_service_supported": {"type": "boolean"},
+    "local_crypto_mining_policy": {
+      "enum": ["PROHIBITED", "NOT_SUPPORTED", "ELIGIBILITY_GATED", "SUPPORTED_AFTER_ALLOWLISTING"]
+    },
+    "remote_miner_management_supported": {"type": "boolean"},
+    "approved_pow_algorithms": {
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1, "maxLength": 100},
+      "default": []
+    },
+    "thermal_sensor_available": {"type": "boolean", "default": false},
+    "power_state_available": {"type": "boolean", "default": false},
+    "network_state_available": {"type": "boolean", "default": false},
+    "attested_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "attestation_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8x8.org/protocol/schemas/proof-receipt.v0.1.json",
+  "title": "8x8 Common Proof Receipt v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema","proof_id","proof_type","proof_class","issuer_id","subject_id",
+    "verifier_id","policy_digest","evidence_commitments","issued_at","expires_at",
+    "nonce","verification_result","reason_codes","privacy_classification",
+    "reward_eligibility","revocation_state","previous_proof_digest","receipt_digest"
+  ],
+  "properties": {
+    "schema": {"const": "8x8.proof-receipt.v0.1"},
+    "proof_id": {"type":"string","pattern":"^PROOF[.][A-Za-z0-9._:-]{8,200}$"},
+    "proof_type": {
+      "enum": [
+        "PROOF_OF_STAKE_BFT","BITCOIN_POW_CHECKPOINT","PROOF_OF_AUTHORITY",
+        "PROOF_OF_COMPUTE","PROOF_OF_USEFUL_WORK","PROOF_OF_REPLICATION",
+        "PROOF_OF_SPACETIME","PROOF_OF_AVAILABILITY","PROOF_OF_SERVICE",
+        "PROOF_OF_KNOWLEDGE","PROOF_OF_CONTRIBUTION","PROOF_OF_REPUTATION",
+        "PROOF_OF_TIME_ORDERING","PROOF_OF_DEVICE_ATTESTATION",
+        "PROOF_OF_AGENT_IDENTITY","PROOF_OF_AUTHORIZATION"
+      ]
+    },
+    "proof_class": {
+      "enum": [
+        "CONSENSUS","ANCHORING","CONSENSUS_DEV_ONLY","CONTRIBUTION",
+        "CONTRIBUTION_RESEARCH","STORAGE","STORAGE_AND_DATA","SERVICE",
+        "CREDENTIAL_OR_ZK","AGGREGATION","REPUTATION","ORDERING_SUPPORT",
+        "IDENTITY_AND_RUNTIME","AUTHORITY"
+      ]
+    },
+    "issuer_id": {"type":"string","minLength":1,"maxLength":300},
+    "subject_id": {"type":"string","minLength":1,"maxLength":300},
+    "verifier_id": {"type":"string","minLength":1,"maxLength":300},
+    "relying_party_id": {"type":["string","null"],"maxLength":300},
+    "policy_digest": {"type":"string","pattern":"^[a-f0-9]{64}$"},
+    "code_digest": {"type":["string","null"],"pattern":"^[a-f0-9]{64}$"},
+    "evidence_commitments": {
+      "type":"array","minItems":1,"maxItems":1000,"uniqueItems":true,
+      "items":{"type":"string","pattern":"^[a-f0-9]{64}$"}
+    },
+    "claims": {"type":"object","additionalProperties":true,"maxProperties":100},
+    "issued_at": {"type":"string","format":"date-time"},
+    "expires_at": {"type":"string","format":"date-time"},
+    "nonce": {"type":"string","minLength":16,"maxLength":300},
+    "verification_result": {"enum":["PASS","FAIL","INDETERMINATE","REVOKED","EXPIRED"]},
+    "reason_codes": {
+      "type":"array","minItems":1,"maxItems":100,"uniqueItems":true,
+      "items":{"type":"string","minLength":1,"maxLength":200}
+    },
+    "privacy_classification": {"enum":["PUBLIC","PSEUDONYMOUS","PRIVATE_REDACTED","OWNER_PRIVATE"]},
+    "reward_eligibility": {
+      "enum":["INELIGIBLE","SIMULATED","MEASURED_UNPRICED","ELIGIBLE_PENDING_REVIEW","FINALIZED_OFFCHAIN","FINALIZED_ONCHAIN"]
+    },
+    "dispute_state": {"enum":["NONE","OPEN","RESOLVED","REJECTED"],"default":"NONE"},
+    "revocation_state": {"enum":["ACTIVE","SUSPENDED","REVOKED","EXPIRED"]},
+    "previous_proof_digest": {"type":["string","null"],"pattern":"^[a-f0-9]{64}$"},
+    "receipt_digest": {"type":"string","pattern":"^[a-f0-9]{64}$"}
+  },
+  "allOf": [
+    {
+      "if":{"properties":{"verification_result":{"enum":["FAIL","INDETERMINATE","REVOKED","EXPIRED"]}}},
+      "then":{"properties":{"reward_eligibility":{"enum":["INELIGIBLE","SIMULATED"]}}}
+    },
+    {
+      "if":{"properties":{"proof_type":{"const":"PROOF_OF_USEFUL_WORK"}}},
+      "then":{"properties":{"reward_eligibility":{"enum":["INELIGIBLE","SIMULATED","MEASURED_UNPRICED"]}}}
+    },
+    {
+      "if":{"properties":{"proof_type":{"enum":["PROOF_OF_REPUTATION","PROOF_OF_KNOWLEDGE","PROOF_OF_AUTHORIZATION"]}}},
+      "then":{"properties":{"reward_eligibility":{"const":"INELIGIBLE"}}}
+    }
+  ]
+}

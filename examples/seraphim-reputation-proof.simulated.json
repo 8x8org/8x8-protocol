@@ -1,0 +1,20 @@
+{
+  "schema": "8x8.seraphim-reputation-proof.v0.1",
+  "credential_id": "SRP.example.seraphim.20260801",
+  "subject_id": "SERAPHIM.example.guardian",
+  "issuer_id": "8x8.protocol.fixture",
+  "issued_at": "2026-08-01T23:30:00Z",
+  "expires_at": "2026-08-08T23:30:00Z",
+  "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "evidence_proof_ids": ["PROOF.example.service.20260801"],
+  "reputation_domains": ["SECURITY_REVIEW", "PROOF_VERIFICATION"],
+  "guardian_roles": ["REVIEWER", "CHALLENGER"],
+  "transferable": false,
+  "saleable": false,
+  "swappable": false,
+  "revocable": true,
+  "revocation_state": "ACTIVE",
+  "authority_expansion_allowed": false,
+  "financial_authority": false,
+  "credential_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+}

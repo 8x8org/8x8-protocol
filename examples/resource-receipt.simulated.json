@@ -1,0 +1,35 @@
+{
+  "schema": "8x8.resource-receipt.v0.1",
+  "receipt_id": "RECEIPT.example.cpu.20260801",
+  "node_id": "NODE.example.public",
+  "consent_id": "CONSENT.example.cpu.20260801",
+  "workload_id": "PUBLIC_CONFORMANCE_TEST.v1",
+  "coordinator_id": "8x8.protocol.fixture",
+  "code_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "policy_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "started_at": "2026-08-01T22:59:00Z",
+  "ended_at": "2026-08-01T22:59:01Z",
+  "resource_class": "CPU",
+  "measured_units": {
+    "cpu_seconds": 0.01,
+    "peak_cpu_percent": 1.0
+  },
+  "declared_limits": {
+    "max_duration_seconds": 60,
+    "max_cpu_percent": 10
+  },
+  "result": "COMPLETED",
+  "reason_code": null,
+  "reward_stage": "SIMULATED",
+  "reward_event_id": "REWARD.example.cpu.20260801",
+  "transaction_reference": null,
+  "dispute_deadline": null,
+  "previous_receipt_digest": null,
+  "receipt_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "privacy_assertions": {
+    "secret_values_excluded": true,
+    "precise_coordinates_excluded": true,
+    "private_message_bodies_excluded": true,
+    "unrelated_personal_paths_excluded": true
+  }
+}

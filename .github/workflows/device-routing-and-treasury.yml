@@ -1,0 +1,88 @@
+name: Device Routing and Treasury
+
+on:
+  push:
+    branches:
+      - feature/node-consent-resource-receipts-v0.1
+    paths:
+      - "specs/device-work-routing-and-treasury-v0.1.md"
+      - "schemas/device-capability.schema.json"
+      - "schemas/work-allocation.schema.json"
+      - "schemas/treasury-settlement.schema.json"
+      - "examples/device-capability.remote-asic.simulated.json"
+      - "examples/work-allocation.remote-asic-btc.simulated.json"
+      - "examples/treasury-settlement.simulated.json"
+      - "scripts/validate_device_routing.py"
+      - "tests/test_device_routing.py"
+      - ".github/workflows/device-routing-and-treasury.yml"
+  pull_request:
+    paths:
+      - "specs/device-work-routing-and-treasury-v0.1.md"
+      - "schemas/device-capability.schema.json"
+      - "schemas/work-allocation.schema.json"
+      - "schemas/treasury-settlement.schema.json"
+      - "examples/device-capability.remote-asic.simulated.json"
+      - "examples/work-allocation.remote-asic-btc.simulated.json"
+      - "examples/treasury-settlement.simulated.json"
+      - "scripts/validate_device_routing.py"
+      - "tests/test_device_routing.py"
+      - ".github/workflows/device-routing-and-treasury.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: device-routing-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate Python syntax without bytecode
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          python -B - <<'PY'
+          from pathlib import Path
+          for name in (
+              "scripts/validate_device_routing.py",
+              "tests/test_device_routing.py",
+          ):
+              path = Path(name)
+              compile(path.read_text(encoding="utf-8"), str(path), "exec")
+              print(f"VALID_PYTHON={path}")
+          PY
+
+      - name: Validate JSON syntax
+        run: |
+          for file in \
+            schemas/device-capability.schema.json \
+            schemas/work-allocation.schema.json \
+            schemas/treasury-settlement.schema.json \
+            examples/device-capability.remote-asic.simulated.json \
+            examples/work-allocation.remote-asic-btc.simulated.json \
+            examples/treasury-settlement.simulated.json; do
+            python -m json.tool "$file" >/dev/null
+            echo "VALID_JSON=$file"
+          done
+
+      - name: Validate routing and treasury invariants
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python -B scripts/validate_device_routing.py
+
+      - name: Run adversarial tests
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python -B -m unittest tests/test_device_routing.py -v
+
+      - name: Verify checkout remained clean
+        run: test -z "$(git status --porcelain=v1 --untracked-files=all)"

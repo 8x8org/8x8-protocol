@@ -1,0 +1,63 @@
+name: Node Protocol Contract
+
+on:
+  push:
+    branches:
+      - feature/node-consent-resource-receipts-v0.1
+    paths:
+      - "specs/node-contribution-v0.1.md"
+      - "schemas/*.json"
+      - "examples/*.json"
+      - "scripts/validate_node_protocol.py"
+      - ".github/workflows/node-protocol-contract.yml"
+  pull_request:
+    paths:
+      - "specs/node-contribution-v0.1.md"
+      - "schemas/*.json"
+      - "examples/*.json"
+      - "scripts/validate_node_protocol.py"
+      - ".github/workflows/node-protocol-contract.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: node-protocol-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate Python syntax without bytecode
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          python -B - <<'PY'
+          from pathlib import Path
+          path = Path("scripts/validate_node_protocol.py")
+          compile(path.read_text(encoding="utf-8"), str(path), "exec")
+          print(f"VALID_PYTHON={path}")
+          PY
+
+      - name: Validate JSON syntax
+        run: |
+          for file in schemas/*.json examples/*.json; do
+            python -m json.tool "$file" >/dev/null
+            echo "VALID_JSON=$file"
+          done
+
+      - name: Validate hard protocol invariants
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python -B scripts/validate_node_protocol.py
+
+      - name: Verify checkout remained clean
+        run: test -z "$(git status --porcelain=v1 --untracked-files=all)"

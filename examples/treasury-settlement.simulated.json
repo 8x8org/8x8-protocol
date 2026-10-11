@@ -1,0 +1,29 @@
+{
+  "schema": "8x8.treasury-settlement.v0.1",
+  "settlement_id": "SETTLEMENT.example.btc.20260801",
+  "allocation_ids": ["ALLOCATION.example.remote-asic-btc.20260801"],
+  "resource_receipt_ids": ["RECEIPT.example.remote-asic-btc.20260801"],
+  "accounting_asset": "BTC",
+  "atomic_unit": "SATOSHI",
+  "gross_proceeds": 1000000,
+  "deductions": {
+    "pool_fee": 20000,
+    "network_fee": 1000,
+    "provider_or_conversion_fee": 5000,
+    "custody_cost": 0,
+    "tax_or_legal_deduction": 0,
+    "direct_operating_cost": 100000
+  },
+  "ecosystem_fee_bps": 488,
+  "ecosystem_fee_amount": 42651,
+  "user_reward_pool": 600000,
+  "treasury_reserve": 200000,
+  "pending_dispute_reserve": 30000,
+  "rounding_remainder": 1349,
+  "reconciles": true,
+  "stage": "SIMULATED",
+  "transaction_reference": null,
+  "created_at": "2026-08-01T23:22:00Z",
+  "finalized_at": null,
+  "settlement_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+}

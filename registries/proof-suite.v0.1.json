@@ -1,0 +1,50 @@
+{
+  "schema": "8x8.proof-suite-registry.v0.1",
+  "status": "DESIGN_NOT_RELEASED",
+  "consensus_target": {
+    "production": "PROOF_OF_STAKE_BFT",
+    "external_anchor": "BITCOIN_POW_CHECKPOINT_RESEARCH",
+    "development_only": "PROOF_OF_AUTHORITY"
+  },
+  "proofs": [
+    {"proof_type":"PROOF_OF_STAKE_BFT","proof_class":"CONSENSUS","maturity":"RESEARCH_ONLY","reward_eligible":false,"verifier_required":true},
+    {"proof_type":"BITCOIN_POW_CHECKPOINT","proof_class":"ANCHORING","maturity":"RESEARCH_ONLY","reward_eligible":false,"verifier_required":true},
+    {"proof_type":"PROOF_OF_AUTHORITY","proof_class":"CONSENSUS_DEV_ONLY","maturity":"DESIGNED","reward_eligible":false,"verifier_required":true},
+    {"proof_type":"PROOF_OF_COMPUTE","proof_class":"CONTRIBUTION","maturity":"DESIGNED","reward_eligible":true,"verifier_required":true},
+    {"proof_type":"PROOF_OF_USEFUL_WORK","proof_class":"CONTRIBUTION_RESEARCH","maturity":"RESEARCH_ONLY","reward_eligible":false,"verifier_required":true},
+    {"proof_type":"PROOF_OF_REPLICATION","proof_class":"STORAGE","maturity":"DESIGNED","reward_eligible":true,"verifier_required":true},
+    {"proof_type":"PROOF_OF_SPACETIME","proof_class":"STORAGE","maturity":"DESIGNED","reward_eligible":true,"verifier_required":true},
+    {"proof_type":"PROOF_OF_AVAILABILITY","proof_class":"STORAGE_AND_DATA","maturity":"DESIGNED","reward_eligible":true,"verifier_required":true},
+    {"proof_type":"PROOF_OF_SERVICE","proof_class":"SERVICE","maturity":"DESIGNED","reward_eligible":true,"verifier_required":true},
+    {"proof_type":"PROOF_OF_KNOWLEDGE","proof_class":"CREDENTIAL_OR_ZK","maturity":"DESIGNED","reward_eligible":false,"verifier_required":true},
+    {"proof_type":"PROOF_OF_CONTRIBUTION","proof_class":"AGGREGATION","maturity":"DESIGNED","reward_eligible":true,"verifier_required":true},
+    {"proof_type":"PROOF_OF_REPUTATION","proof_class":"REPUTATION","maturity":"DESIGNED","reward_eligible":false,"verifier_required":true},
+    {"proof_type":"PROOF_OF_TIME_ORDERING","proof_class":"ORDERING_SUPPORT","maturity":"DESIGNED","reward_eligible":false,"verifier_required":true},
+    {"proof_type":"PROOF_OF_DEVICE_ATTESTATION","proof_class":"IDENTITY_AND_RUNTIME","maturity":"DESIGNED","reward_eligible":false,"verifier_required":true},
+    {"proof_type":"PROOF_OF_AGENT_IDENTITY","proof_class":"IDENTITY_AND_RUNTIME","maturity":"DESIGNED","reward_eligible":false,"verifier_required":true},
+    {"proof_type":"PROOF_OF_AUTHORIZATION","proof_class":"AUTHORITY","maturity":"DESIGNED","reward_eligible":false,"verifier_required":true}
+  ],
+  "common_requirements": [
+    "VERSIONED_SCHEMA",
+    "ISSUER_IDENTITY",
+    "SUBJECT_IDENTITY",
+    "VERIFIER_IDENTITY",
+    "POLICY_DIGEST",
+    "EVIDENCE_COMMITMENTS",
+    "ISSUED_AT",
+    "EXPIRES_AT",
+    "REPLAY_NONCE",
+    "VERIFICATION_RESULT",
+    "PRIVACY_CLASSIFICATION",
+    "REVOCATION_STATE",
+    "RECEIPT_DIGEST"
+  ],
+  "forbidden_equivalences": [
+    "CONTRIBUTION_PROOF_EQUALS_CONSENSUS",
+    "REPUTATION_EQUALS_AUTHORIZATION",
+    "AUTHORIZATION_EQUALS_EXECUTION",
+    "COMPUTATION_EQUALS_USEFUL_WORK",
+    "ACTIVITY_COUNT_EQUALS_REWARD",
+    "AI_OUTPUT_EQUALS_KNOWLEDGE_PROOF"
+  ]
+}
